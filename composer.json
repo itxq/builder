@@ -1,0 +1,27 @@
+{
+    "name"       : "itxq/builder",
+    "description": "ThinkPHP5.1专用Html生成器",
+    "type"       : "library",
+    "license"    : "Apache-2.0",
+    "authors"    : [
+        {
+            "name" : "IT小强xqitw.cn",
+            "email": "mail@xqitw.cn"
+        }
+    ],
+    "require"    : {
+        "php"               : ">=7.1.0",
+        "itxq/kelove-core"  : ">=1.0.0",
+        "ext-json"          : ">=1.2",
+        "topthink/framework": "v5.2.*-dev"
+    },
+    "autoload"   : {
+        "psr-4": {
+            "itxq\\builder\\": "src",
+            "app\\"          : "app"
+        },
+        "files": [
+            "src/helper.php"
+        ]
+    }
+}
