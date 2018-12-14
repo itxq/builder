@@ -1,0 +1,6 @@
+/.idea
+/vendor/
+/app/
+/kelove/
+/test/
+/composer.lock
