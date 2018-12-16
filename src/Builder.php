@@ -121,7 +121,7 @@ class Builder
         if (empty($this->rootPath)) {
             throw new Exception('未设置模板根目录');
         }
-        $this->viewConfig = $this->getViewConfig();
+        $this->viewConfig = $this->getViewConfig('template');
         $this->view = new View();
         $this->view->init($this->viewConfig);
         $assign = [
@@ -154,8 +154,8 @@ class Builder
      * @return $this | FormBuilder | TableBuilder | Builder
      */
     public function addJs($js) {
-        $this->hookAdd($this->jsHook, function () use ($js) {
-            echo $js;
+        $this->eventListen($this->jsHook, function () use ($js) {
+            return $js;
         });
         return $this;
     }
@@ -166,8 +166,8 @@ class Builder
      * @return $this | FormBuilder | TableBuilder | Builder
      */
     public function addCss($css) {
-        $this->hookAdd($this->cssHook, function () use ($css) {
-            echo $css;
+        $this->eventListen($this->cssHook, function () use ($css) {
+            return $css;
         });
         return $this;
     }
@@ -179,26 +179,27 @@ class Builder
      * @param bool $isMin - 是否压缩
      * @param string $version - 版本号
      */
-    public function autoloadAssets(string $assetsName, string $type = 'all', bool $isMin = true, string $version = ''): void {
+    protected function autoloadAssets(string $assetsName, string $type = 'all'): void {
+        $config = $this->getViewConfig('assets');
         if ($type === 'js') {
-            //  $js = autoload_assets($assetsName, 'js', $isMin, $version);
-            //  $this->hookAdd($this->jsHook, function () use ($js) {
-            //      echo $js;
-            //  });
+            $js = $this->handleAssets($assetsName, $config, 'js');
+            $this->eventListen($this->jsHook, function () use ($js) {
+                return $js;
+            });
         } else if ($type === 'css') {
-            // $css = autoload_assets($assetsName, 'css', $isMin, $version);
-            // $this->hookAdd($this->cssHook, function () use ($css) {
-            //     echo $css;
-            // });
+            $css = $this->handleAssets($assetsName, $config, 'css');
+            $this->eventListen($this->cssHook, function () use ($css) {
+                return $css;
+            });
         } else {
-            // $js = autoload_assets($assetsName, 'js', $isMin, $version);
-            // $this->hookAdd($this->jsHook, function () use ($js) {
-            //     echo $js;
-            // });
-            // $css = autoload_assets($assetsName, 'css', $isMin, $version);
-            // $this->hookAdd($this->cssHook, function () use ($css) {
-            //     echo $css;
-            // });
+            $js = $this->handleAssets($assetsName, $config, 'js');
+            $this->eventListen($this->jsHook, function () use ($js) {
+                return $js;
+            });
+            $css = $this->handleAssets($assetsName, $config, 'css');
+            $this->eventListen($this->cssHook, function () use ($css) {
+                return $css;
+            });
         }
     }
     
@@ -262,12 +263,13 @@ class Builder
     
     /**
      * 动态添加行为扩展到某个标签
-     * @param  string|array $name 事件别名
-     * @param  mixed $event 事件名称
+     * @param  string $event 事件名称
+     * @param  mixed $listener 监听操作（或者类名）
+     * @param  bool $first 是否优先执行
      * @return void
      */
-    protected function eventBind($name, $event = null) {
-        \think\facade\Event::bind($name, $event);
+    protected function eventListen(string $event, $listener, bool $first = false): void {
+        builder_event_listen($event, $listener, $first);
     }
     
     /**
@@ -342,13 +344,45 @@ class Builder
     
     /**
      * 加载模板配置
+     * @param string $name - 文件名
      * @return array
      */
-    protected function getViewConfig() {
+    protected function getViewConfig(string $name = 'template') {
         $path = $this->rootPath . $this->template . DIRECTORY_SEPARATOR;
         if (!is_dir($path)) {
             $path = $this->rootPath . 'default' . DIRECTORY_SEPARATOR;
         }
-        return include realpath($path . 'template.php');
+        $file = realpath($path . $name . '.php');
+        if (!is_file($file)) {
+            return [];
+        }
+        $config = include $file;
+        return is_array($config) ? $config : [];
+    }
+    
+    /**
+     * @param string $assetsName
+     * @param array $config
+     * @param string $type
+     * @return string
+     */
+    protected function handleAssets(string $assetsName, array $config, string $type) {
+        $assetsHtml = '';
+        $defineName = 'AUTOLOAD_ASSETS_' . strtoupper($assetsName) . '_' . strtoupper($type) . '_0';
+        if (defined($defineName)) {
+            return $assetsHtml;
+        }
+        define($defineName, true);
+        $assets = get_sub_value($assetsName . '.' . $type, $config, []);
+        if ($type === 'js') {
+            foreach ($assets as $v) {
+                $assetsHtml .= '<script type="text/javascript" src="' . $v . '"></script>';
+            }
+        } else if ($type === 'css') {
+            foreach ($assets as $v) {
+                $assetsHtml .= '<link rel="stylesheet" type="text/css" href="' . $v . '">';
+            }
+        }
+        return $assetsHtml;
     }
 }
