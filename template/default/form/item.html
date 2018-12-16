@@ -1,0 +1,11 @@
+<div class="col-sm-<{$item_col}>">
+    <div class="form-group">
+        <label for="<{$id}>" class="col-sm-<{$width==0?'12':$width}> control-label">
+            <{$title}>
+        </label>
+        <div class="col-sm-<{$col_width}>">
+            <{$content|raw}>
+            <span class="help-<{$help_type|default=''}> text-info"><{$help}></span>
+        </div>
+    </div>
+</div>

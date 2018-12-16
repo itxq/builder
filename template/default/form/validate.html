@@ -1,0 +1,52 @@
+<script type="text/javascript">
+    (function ($) {
+        var formId = '#<{$form_id}>';
+        var validate_config = {};
+        validate_config.message = '表单验证未通过';
+        validate_config.feedbackIcons = {
+            valid: 'fa fa-check',
+            invalid: 'fa fa-times',
+            validating: 'fa fa-refresh'
+        };
+        var validate_config_fields = '<{$validate_config|default=\'{}\'}>';
+        validate_config.fields = eval('(' + validate_config_fields + ')');
+        $(document).ready(function () {
+            $(formId).bootstrapValidator(validate_config).on('success.form.bv', function (e) {
+                e.preventDefault();
+                if (typeof CKEDITOR !== 'undefined') {
+                    for (var instance in CKEDITOR.instances) {
+                        CKEDITOR.instances[instance].updateElement();
+                    }
+                }
+                var form = $(e.target);
+                var formData = form.serialize();
+                formData = formData.replace(/<{$base_url_upload}>/ig, "UPLOADS___");
+                formData = formData.replace(/<{$base_url_static}>/ig, "STATIC___");
+                $.ajax({
+                    url: form.attr('action'),
+                    type: '<{$method}>',
+                    data: formData,
+                    success: function (re) {
+                        if (re.code === 1) {
+                            alertNotify(re.msg, 'success');
+                            var redirectUrl = '<{$redirect_url}>';
+                            redirectUrl = (redirectUrl === '') ? re.url : redirectUrl;
+                            if (redirectUrl !== '') {
+                                setTimeout(function () {
+                                    window.location.href = redirectUrl;
+                                }, 1000);
+                            }
+                        } else {
+                            alertNotify(re.msg, 'danger');
+                        }
+                        $(formId).bootstrapValidator('resetForm');
+                        $(formId).bootstrapValidator('disableSubmitButtons', false);
+                    },
+                    error: function () {
+                        $(formId).bootstrapValidator('disableSubmitButtons', false);
+                    }
+                });
+            });
+        });
+    }(window.jQuery));
+</script>
