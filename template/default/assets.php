@@ -18,10 +18,12 @@ return [
     ],
     /* ------------------------------- 表单 ---------------------------------------------------------- */
     'form.css'      => [
-        'assets/bootstrapvalidator-0.5.3/css/bootstrapValidator.min.css'
+        'assets/bootstrapvalidator-0.5.3/css/bootstrapValidator.min.css',
+        'assets/bootstrapvalidator-0.5.3/css/style.min.css'
     ],
     'form.js'       => [
         'assets/bootstrapvalidator-0.5.3/js/bootstrapValidator.min.js',
         'assets/bootstrapvalidator-0.5.3/js/language/zh_CN.js',
+        'assets/bootstrapvalidator-0.5.3/js/script.min.js',
     ]
 ];

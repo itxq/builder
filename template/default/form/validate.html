@@ -20,8 +20,6 @@
                 }
                 var form = $(e.target);
                 var formData = form.serialize();
-                formData = formData.replace(/<{$base_url_upload}>/ig, "UPLOADS___");
-                formData = formData.replace(/<{$base_url_static}>/ig, "STATIC___");
                 $.ajax({
                     url: form.attr('action'),
                     type: '<{$method}>',
