@@ -13,6 +13,9 @@
 namespace itxq\builder;
 
 use think\Exception;
+use think\exception\HttpException;
+use think\facade\Config;
+use think\facade\Request;
 use think\View;
 
 /**
@@ -20,7 +23,7 @@ use think\View;
  * Class Builder
  * @package itxq\builder
  */
-class Builder
+abstract class Builder
 {
     /**
      * js挂载点名称
@@ -105,9 +108,8 @@ class Builder
      * @throws Exception
      */
     public function __construct(array $config = []) {
-        error_reporting(E_ALL & ~E_NOTICE);
         $this->template = get_sub_value('template_name', $config, 'default');
-        $this->rootPath = get_sub_value('template_path', $config, realpath(__DIR__ . '/../template') . DIRECTORY_SEPARATOR);
+        $this->rootPath = realpath(get_sub_value('template_path', $config, __DIR__ . '/../template'));
         $this->type = get_sub_value('type', $config, '');
         if (isset($config['js_hook']) && !empty($config['js_hook'])) {
             $this->jsHook = $config['js_hook'];
@@ -118,10 +120,18 @@ class Builder
         if (empty($this->template)) {
             throw new Exception('未设置模板名称');
         }
-        if (empty($this->rootPath)) {
+        if (!is_dir($this->rootPath)) {
             throw new Exception('未设置模板根目录');
         }
+        $this->rootPath .= DIRECTORY_SEPARATOR;
+        if (get_sub_value('jquery', $config, false)) {
+            $this->autoloadAssets('jquery', 'js');
+        }
+        if (get_sub_value('bootstrap', $config, false)) {
+            $this->autoloadAssets('bootstrap', 'all');
+        }
         $this->viewConfig = $this->getViewConfig('template');
+        $this->getAssets();
         $this->view = new View();
         $this->view->init($this->viewConfig);
         $assign = [
@@ -154,7 +164,7 @@ class Builder
      * @return $this | FormBuilder | TableBuilder | Builder
      */
     public function addJs($js) {
-        $this->eventListen($this->jsHook, function () use ($js) {
+        builder_event_listen($this->jsHook, function () use ($js) {
             return $js;
         });
         return $this;
@@ -166,7 +176,7 @@ class Builder
      * @return $this | FormBuilder | TableBuilder | Builder
      */
     public function addCss($css) {
-        $this->eventListen($this->cssHook, function () use ($css) {
+        builder_event_listen($this->cssHook, function () use ($css) {
             return $css;
         });
         return $this;
@@ -176,28 +186,26 @@ class Builder
      * 自动加载js、css资源
      * @param string $assetsName - 名称
      * @param string $type - 类型（css/js/all）
-     * @param bool $isMin - 是否压缩
-     * @param string $version - 版本号
      */
     protected function autoloadAssets(string $assetsName, string $type = 'all'): void {
         $config = $this->getViewConfig('assets');
         if ($type === 'js') {
             $js = $this->handleAssets($assetsName, $config, 'js');
-            $this->eventListen($this->jsHook, function () use ($js) {
+            builder_event_listen($this->jsHook, function () use ($js) {
                 return $js;
             });
         } else if ($type === 'css') {
             $css = $this->handleAssets($assetsName, $config, 'css');
-            $this->eventListen($this->cssHook, function () use ($css) {
+            builder_event_listen($this->cssHook, function () use ($css) {
                 return $css;
             });
         } else {
             $js = $this->handleAssets($assetsName, $config, 'js');
-            $this->eventListen($this->jsHook, function () use ($js) {
+            builder_event_listen($this->jsHook, function () use ($js) {
                 return $js;
             });
             $css = $this->handleAssets($assetsName, $config, 'css');
-            $this->eventListen($this->cssHook, function () use ($css) {
+            builder_event_listen($this->cssHook, function () use ($css) {
                 return $css;
             });
         }
@@ -259,17 +267,6 @@ class Builder
      */
     public function returnHtml() {
         return $this->html;
-    }
-    
-    /**
-     * 动态添加行为扩展到某个标签
-     * @param  string $event 事件名称
-     * @param  mixed $listener 监听操作（或者类名）
-     * @param  bool $first 是否优先执行
-     * @return void
-     */
-    protected function eventListen(string $event, $listener, bool $first = false): void {
-        builder_event_listen($event, $listener, $first);
     }
     
     /**
@@ -376,13 +373,62 @@ class Builder
         $assets = get_sub_value($assetsName . '.' . $type, $config, []);
         if ($type === 'js') {
             foreach ($assets as $v) {
-                $assetsHtml .= '<script type="text/javascript" src="' . $v . '"></script>';
+                $assetsHtml .= '<script type="text/javascript" src="' . $this->getTrueUrl($v) . '"></script>';
             }
         } else if ($type === 'css') {
             foreach ($assets as $v) {
-                $assetsHtml .= '<link rel="stylesheet" type="text/css" href="' . $v . '">';
+                $assetsHtml .= '<link rel="stylesheet" type="text/css" href="' . $this->getTrueUrl($v) . '">';
             }
         }
         return $assetsHtml;
+    }
+    
+    /**
+     * 获取完整的URL路径
+     * @param string $url
+     * @return mixed|string
+     */
+    protected function getTrueUrl(string $url) {
+        $tplReplaceString = array_merge((array)Config::get('template.tpl_replace_string'), get_sub_value('tpl_replace_string', $this->viewConfig, []));
+        $url = str_replace(array_keys($tplReplaceString), array_values($tplReplaceString), $url);
+        if (strpos($url, '//') === 0) {
+            $url = Request::scheme() . ':' . $url;
+        } else if (strpos($url, '/') === 0) {
+            $url = Request::domain() . $url;
+        } else {
+            $base = Request::scheme() . '://' . Request::server('HTTP_HOST') . Request::server('PHP_SELF');
+            $url = $base . '?action=get_assets&create_builder_url=' . $url;
+        }
+        return $url;
+    }
+    
+    /**
+     * 输出资源文件
+     */
+    protected function getAssets() {
+        $action = Request::get('action', null);
+        $url = Request::get('create_builder_url', '');
+        if ($action === 'get_assets' && !empty($url)) {
+            $ext = strtolower(pathinfo($url, PATHINFO_EXTENSION));
+            if ($ext === 'css') {
+                $type = 'text/css';
+            } else if ($ext === 'js') {
+                $type = 'text/javascript';
+            } else if ($ext === 'png') {
+                $type = 'image/png';
+            } else if ($ext === 'gif') {
+                $type = 'image/gif';
+            } else if ($ext === 'jpg' || $ext === 'jpeg') {
+                $type = 'image/jpeg';
+            } else {
+                $type = 'text/html';
+            }
+            header('Content-type:' . $type);
+            $path = realpath($this->rootPath . $url);
+            if (!is_file($path)) {
+                throw new HttpException('404', '资源文件不存在');
+            }
+            exit(file_get_contents($path));
+        }
     }
 }
