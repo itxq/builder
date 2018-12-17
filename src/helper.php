@@ -21,10 +21,10 @@ if (!function_exists('create_form')) {
      * @return \itxq\builder\FormBuilder
      * @throws \think\Exception
      */
-    function create_form($data = null, int $colWidth = 2, string $template = 'default', array $config = []) {
+    function create_form($data = null, int $colWidth = 0, string $template = 'default', array $config = []) {
         $config['data'] = $data;
         $config['width'] = $colWidth;
-        $config['template'] = $template;
+        $config['template_name'] = $template;
         $formBuilder = new \itxq\builder\FormBuilder($config);
         return $formBuilder;
     }
