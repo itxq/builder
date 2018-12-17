@@ -153,10 +153,45 @@ class FormBuilder extends Builder
             'id'          => $id,
             'value'       => $value,
             'placeholder' => addslashes(strip_tags($placeholder)),
-            'help'        => addslashes(strip_tags($help)),
+            'help'        => $help,
         ];
         $this->assign($assign);
         $content = $this->fetch('input');
+        $this->curHtml = $this->addItem($id, $name, $content, $title, $validate, $help, $itemCol);
+        return $this;
+    }
+    
+    /**
+     * 添加单行文本框列表
+     * @param $name - name
+     * @param string $title - 标题
+     * @param array $validate - 字段验证
+     * @param string $placeholder - 提示语句
+     * @param string $help - 提示语句
+     * @param int $itemCol - 默认表单项宽度
+     * @throws Exception
+     * @return FormBuilder
+     */
+    public function addTexts($name, string $title = '', array $validate = [], string $placeholder = '', string $help = '', int $itemCol = 12) {
+        if (is_array($name)) {
+            $itemCol = get_sub_value('width', $name, $itemCol);
+            $placeholder = get_sub_value('placeholder', $name, '');
+            $help = get_sub_value('help', $name, '');
+            $validate = get_sub_value('validate', $name, []);
+            $title = get_sub_value('title', $name, '');
+            $name = get_sub_value('name', $name, '');
+        }
+        $value = $this->unSerialize($this->getFormData($name, []), false);
+        $id = $this->formConfig['form_id'] . '_' . $name;
+        $assign = [
+            'name'        => $name,
+            'id'          => $id,
+            'value'       => $value,
+            'placeholder' => addslashes(strip_tags($placeholder)),
+            'help'        => $help,
+        ];
+        $this->assign($assign);
+        $content = $this->fetch('input-list');
         $this->curHtml = $this->addItem($id, $name, $content, $title, $validate, $help, $itemCol);
         return $this;
     }
@@ -279,7 +314,7 @@ class FormBuilder extends Builder
             'base_url_static' => urlencode('static'),
         ];
         $this->assign($assign);
-        $html = str_replace(['UPLOADS___', 'STATIC___'], ['__UPLOADS__', '__STATIC__'], $this->fetch('validate'));
+        $html = $this->fetch('validate');
         builder_event_listen($this->jsHook, function () use ($html) {
             return htmlspecialchars_decode($html);
         });
