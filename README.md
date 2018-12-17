@@ -1,2 +1,2 @@
 # builder
-ThinkPHP5.1专用Html生成器
+ThinkPHP5.2专用Html生成器

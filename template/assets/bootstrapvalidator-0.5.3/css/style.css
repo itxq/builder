@@ -1,3 +1,6 @@
+.builder-create-form {margin-top: 1rem; }
+
+/* 多行json 样式 */
 .form-json-group {width: 100%;}
 
 .form-json-group-demo {display: none;}
@@ -5,3 +8,18 @@
 .form-json-group-core {width: 100%;}
 
 .form-json-group-core .form-json-item {margin-bottom: 10px;}
+
+/* radio 优化 */
+.demo--label {margin: 5px 0;display: inline-block;cursor: pointer;line-height: 1.2;}
+
+.demo--radio {display: none;}
+
+.demo--radioInput {background-color: #FFF;border: 1px solid rgba(0, 0, 0, 0.15);border-radius: 50%;display: inline-block;height: 18px;margin: 0 5px 0 10px;vertical-align: bottom;width: 18px;}
+
+.demo--radioInput:after {background-color: transparent;border-radius: 50%;content: "";display: inline-block;height: 12px;margin: 2px;width: 12px;}
+
+.demo--radioInput-help {height: 18px;line-height: 18px;}
+
+.demo--radio:checked + .demo--radioInput:after {background-color: #57AD68;}
+
+.demo--checkbox.demo--radioInput, .demo--radio:checked + .demo--checkbox.demo--radioInput:after {border-radius: 0;}

@@ -127,6 +127,28 @@ class FormBuilder extends Builder
     }
     
     /**
+     * 添加hidden隐藏域
+     * @param string $name - name
+     * @throws Exception
+     * @return FormBuilder
+     */
+    public function addHidden($name) {
+        if (is_array($name)) {
+            $name = get_sub_value('name', $name, '');
+        }
+        $assign = [
+            'name'  => $name,
+            'id'    => $this->formConfig['form_id'] . '_' . $name,
+            'value' => str_replace('"', '\'', $this->getFormData($name, ''))
+        ];
+        $this->assign($assign);
+        $content = $this->fetch('hidden');
+        $this->curHtml = $content;
+        $this->html .= $content;
+        return $this;
+    }
+    
+    /**
      * 添加单行文本框
      * @param $name - name
      * @param string $title - 标题
@@ -192,6 +214,80 @@ class FormBuilder extends Builder
         ];
         $this->assign($assign);
         $content = $this->fetch('input-list');
+        $this->curHtml = $this->addItem($id, $name, $content, $title, $validate, $help, $itemCol);
+        return $this;
+    }
+    
+    /**
+     * 添加单选按钮
+     * @param $name - name
+     * @param string $title - 标题
+     * @param $list - 可选项列表
+     * @param array $validate - 字段验证
+     * @param string $help - 提示语句
+     * @param int $itemCol - 默认表单项宽度
+     * @throws Exception
+     * @return FormBuilder
+     */
+    public function addRadio($name, string $title = '', array $list = [], array $validate = [], string $help = '', int $itemCol = 12) {
+        if (is_array($name)) {
+            $itemCol = get_sub_value('width', $name, $itemCol);
+            $help = get_sub_value('help', $name, '');
+            $validate = get_sub_value('validate', $name, []);
+            $list = get_sub_value('list', $name, []);
+            $title = get_sub_value('title', $name, '');
+            $name = get_sub_value('name', $name, '');
+        }
+        $value = $this->getFormData($name, false);
+        $list = $this->unSerialize($list);
+        $id = $id = $this->formConfig['form_id'] . '_' . $name;
+        $list_key = array_keys($list);
+        if ($value === false || !in_array($value, $list_key)) {
+            $value = $list_key[0];
+        }
+        $assign = [
+            'name'        => $name,
+            'value'       => str_replace('"', '\'', $value),
+            'placeholder' => addslashes(strip_tags($help)),
+            'list'        => $list,
+        ];
+        $this->assign($assign);
+        $content = $this->fetch('radio');
+        $this->curHtml = $this->addItem($id, $name, $content, $title, $validate, $help, $itemCol);
+        return $this;
+    }
+    
+    /**
+     * 添加多选按钮
+     * @param $name
+     * @param array $list
+     * @param string $title
+     * @param array $validate - 字段验证
+     * @param string $help - 提示语句
+     * @param int $itemCol - 默认表单项宽度
+     * @throws Exception
+     * @return FormBuilder
+     */
+    public function addCheckbox($name, string $title = '', array $list = [], array $validate = [], string $help = '', int $itemCol = 12) {
+        if (is_array($name)) {
+            $itemCol = get_sub_value('width', $name, $itemCol);
+            $help = get_sub_value('help', $name, '');
+            $validate = get_sub_value('validate', $name, []);
+            $list = get_sub_value('list', $name, []);
+            $title = get_sub_value('title', $name, '');
+            $name = get_sub_value('name', $name, '');
+        }
+        $value = $this->unSerialize($this->getFormData($name, []));
+        $list = $this->unSerialize($list);
+        $id = $this->formConfig['form_id'] . '_' . $name;
+        $assign = [
+            'name'        => $name,
+            'value'       => $value,
+            'placeholder' => addslashes(strip_tags($help)),
+            'list'        => $list,
+        ];
+        $this->assign($assign);
+        $content = $this->fetch('checkbox');
         $this->curHtml = $this->addItem($id, $name, $content, $title, $validate, $help, $itemCol);
         return $this;
     }
