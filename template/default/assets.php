@@ -5,12 +5,23 @@
 // +----------------------------------------------------------------------
 
 return [
-    'form.css' => [
-        'https://cdn.bootcss.com/bootstrap/4.0.0/css/bootstrap.min.css'
+    /* ------------------------------- jquery ---------------------------------------------------------- */
+    'jquery.js'     => [
+        'assets/jquery-3.3.1/jquery-3.3.1.min.js'
     ],
-    'form.js'  => [
-        'https://cdn.bootcss.com/jquery/3.2.1/jquery.slim.min.js',
-        'https://cdn.bootcss.com/popper.js/1.12.9/umd/popper.min.js',
-        'https://cdn.bootcss.com/bootstrap/4.0.0/js/bootstrap.min.js',
+    /* ------------------------------- bootstrap ---------------------------------------------------------- */
+    'bootstrap.css' => [
+        'assets/bootstrap-4.1.3/css/bootstrap.min.css'
+    ],
+    'bootstrap.js'  => [
+        'assets/bootstrap-4.1.3/js/bootstrap.min.js'
+    ],
+    /* ------------------------------- 表单 ---------------------------------------------------------- */
+    'form.css'      => [
+        'assets/bootstrapvalidator-0.5.3/css/bootstrapValidator.min.css'
+    ],
+    'form.js'       => [
+        'assets/bootstrapvalidator-0.5.3/js/bootstrapValidator.min.js',
+        'assets/bootstrapvalidator-0.5.3/js/language/zh_CN.js',
     ]
 ];
