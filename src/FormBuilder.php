@@ -13,6 +13,7 @@
 namespace itxq\builder;
 
 use think\Exception;
+use think\facade\Request;
 
 /**
  * 表单构建器
@@ -109,12 +110,16 @@ class FormBuilder extends Builder
         $this->curHtml = $html;
         $this->html .= $html;
         $this->addBootstrapValidator($redirectUrl);
-        if (request()->isPost()) {
-            halt(request()->post());
+        if (Request::isPost()) {
+            halt(Request::post());
         }
         return $this;
     }
     
+    /**
+     * 添加HR分割线
+     * @return FormBuilder
+     */
     public function addHr() {
         $this->curHtml = '<hr style="height: 0;width: 100%;margin: 0;padding: 0;color: transparent;border: 0;">';
         $this->html .= $this->curHtml;
@@ -126,15 +131,17 @@ class FormBuilder extends Builder
      * @param $name - name
      * @param string $title - 标题
      * @param array $validate - 字段验证
+     * @param string $placeholder - 提示语句
      * @param string $help - 提示语句
      * @param int $itemCol - 默认表单项宽度
      * @throws Exception
      * @return FormBuilder
      */
-    public function addText($name, $title = '', $validate = [], $help = '', $itemCol = 12) {
+    public function addText($name, string $title = '', array $validate = [], string $placeholder = '', string $help = '', int $itemCol = 12) {
         if (is_array($name)) {
             $itemCol = get_sub_value('width', $name, $itemCol);
             $help = get_sub_value('help', $name, '');
+            $placeholder = get_sub_value('placeholder', $name, '');
             $validate = get_sub_value('validate', $name, []);
             $title = get_sub_value('title', $name, '');
             $name = get_sub_value('name', $name, '');
@@ -145,7 +152,8 @@ class FormBuilder extends Builder
             'name'        => $name,
             'id'          => $id,
             'value'       => $value,
-            'placeholder' => addslashes(strip_tags($help))
+            'placeholder' => addslashes(strip_tags($placeholder)),
+            'help'        => addslashes(strip_tags($help)),
         ];
         $this->assign($assign);
         $content = $this->fetch('input');
@@ -272,7 +280,7 @@ class FormBuilder extends Builder
         ];
         $this->assign($assign);
         $html = str_replace(['UPLOADS___', 'STATIC___'], ['__UPLOADS__', '__STATIC__'], $this->fetch('validate'));
-        $this->eventListen($this->jsHook, function () use ($html) {
+        builder_event_listen($this->jsHook, function () use ($html) {
             return htmlspecialchars_decode($html);
         });
     }
