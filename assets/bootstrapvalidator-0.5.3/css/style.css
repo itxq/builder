@@ -1,5 +1,7 @@
 /* 基础设置 */
-.builder-create-form {margin-top: 1rem; }
+.builder-create-form {margin-top: 1rem;overflow: hidden; }
+
+.builder-create-form .form-control, .form-control:focus {box-shadow: none !important;}
 
 .builder-create-form .help-block {display: inline-block;font-size: 1rem;line-height: 1.5;color: #DC3545;margin: 5px 2rem 0 0;}
 
