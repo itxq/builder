@@ -1,6 +1,6 @@
 {
     "name"       : "itxq/builder",
-    "description": "ThinkPHP5.1专用Html生成器",
+    "description": "ThinkPHP5.2专用Html生成器",
     "type"       : "library",
     "license"    : "Apache-2.0",
     "authors"    : [
@@ -17,8 +17,7 @@
     },
     "autoload"   : {
         "psr-4": {
-            "itxq\\builder\\": "src",
-            "app\\"          : "app"
+            "itxq\\": "src"
         },
         "files": [
             "src/helper.php"

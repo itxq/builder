@@ -59,7 +59,13 @@ abstract class Builder
      * 根目录
      * @var string
      */
-    protected $rootPath;
+    protected $rootPath = '';
+    
+    /**
+     * 静态资源默认目录
+     * @var string
+     */
+    protected $assetPath = '';
     
     /**
      * 模板根目录
@@ -110,6 +116,7 @@ abstract class Builder
     public function __construct(array $config = []) {
         $this->template = get_sub_value('template_name', $config, 'default');
         $this->rootPath = realpath(get_sub_value('template_path', $config, __DIR__ . '/../template'));
+        $this->assetPath = realpath(get_sub_value('assets_path', $config, __DIR__ . '/../../assets'));
         $this->type = get_sub_value('type', $config, '');
         if (isset($config['js_hook']) && !empty($config['js_hook'])) {
             $this->jsHook = $config['js_hook'];
@@ -123,6 +130,10 @@ abstract class Builder
         if (!is_dir($this->rootPath)) {
             throw new Exception('未设置模板根目录');
         }
+        if (!is_dir($this->assetPath)) {
+            throw new Exception('未设置静态资源根目录');
+        }
+        $this->assetPath .= DIRECTORY_SEPARATOR;
         $this->rootPath .= DIRECTORY_SEPARATOR;
         if (get_sub_value('jquery', $config, false)) {
             $this->autoloadAssets('jquery', 'js');
@@ -395,6 +406,9 @@ abstract class Builder
             $url = Request::scheme() . ':' . $url;
         } else if (strpos($url, '/') === 0) {
             $url = Request::domain() . $url;
+        } else if (strpos($url, '__assets__/') === 0) {
+            $base = Request::scheme() . '://' . Request::server('HTTP_HOST') . Request::server('PHP_SELF');
+            $url = $base . '?action=get_assets_common&create_builder_url=' . $url;
         } else {
             $base = Request::scheme() . '://' . Request::server('HTTP_HOST') . Request::server('PHP_SELF');
             $url = $base . '?action=get_assets&create_builder_url=' . $url;
@@ -406,29 +420,37 @@ abstract class Builder
      * 输出资源文件
      */
     protected function getAssets() {
-        $action = Request::get('action', null);
-        $url = Request::get('create_builder_url', '');
-        if ($action === 'get_assets' && !empty($url)) {
-            $ext = strtolower(pathinfo($url, PATHINFO_EXTENSION));
-            if ($ext === 'css') {
-                $type = 'text/css';
-            } else if ($ext === 'js') {
-                $type = 'text/javascript';
-            } else if ($ext === 'png') {
-                $type = 'image/png';
-            } else if ($ext === 'gif') {
-                $type = 'image/gif';
-            } else if ($ext === 'jpg' || $ext === 'jpeg') {
-                $type = 'image/jpeg';
-            } else {
-                $type = 'text/html';
-            }
-            header('Content-type:' . $type);
-            $path = realpath($this->rootPath . $url);
-            if (!is_file($path)) {
-                throw new HttpException('404', '资源文件不存在');
-            }
-            exit(file_get_contents($path));
+        $action = strip_tags(strval(Request::get('action', '')));
+        $url = strip_tags(strval(Request::get('create_builder_url', '')));
+        $allowAction = ['get_assets', 'get_assets_common'];
+        if (empty($action) || empty($url) || !in_array($action, $allowAction)) {
+            return false;
         }
+        $url = strtolower($url);
+        $path = $this->rootPath;
+        if ($action === 'get_assets_common') {
+            $url = str_replace('__assets__/', '', $url);
+            $path = $this->assetPath;
+        }
+        $ext = pathinfo($url, PATHINFO_EXTENSION);
+        if ($ext === 'css') {
+            $type = 'text/css';
+        } else if ($ext === 'js') {
+            $type = 'text/javascript';
+        } else if ($ext === 'png') {
+            $type = 'image/png';
+        } else if ($ext === 'gif') {
+            $type = 'image/gif';
+        } else if ($ext === 'jpg' || $ext === 'jpeg') {
+            $type = 'image/jpeg';
+        } else {
+            $type = 'text/html';
+        }
+        header('Content-type:' . $type);
+        $path = realpath($path . $url);
+        if (!is_file($path)) {
+            throw new HttpException(404, '资源文件不存在');
+        }
+        exit(file_get_contents($path));
     }
 }
