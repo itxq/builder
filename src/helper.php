@@ -1,14 +1,28 @@
 <?php
-/**
- *  ==================================================================
- *        文 件 名: helper.php
- *        概    要: 助手函数
- *        作    者: IT小强
- *        创建时间: 2018-11-13 13:14
- *        修改时间:
- *        copyright (c) 2016 - 2018 mail@xqitw.cn
- *  ==================================================================
- */
+
+// +----------------------------------------------------------------------
+// | 助手函数
+// +----------------------------------------------------------------------
+
+if (!function_exists('get_sub_value')) {
+    /**
+     * 获取数组、对象下标对应值，不存在时返回指定的默认值
+     * @param string|integer $name - 下标（键名）
+     * @param array|object $data - 原始数组/对象
+     * @param mixed $default - 指定默认值
+     * @return mixed
+     */
+    function get_sub_value(string $name, $data, $default = '') {
+        if (is_object($data)) {
+            $value = isset($data->$name) ? $data->$name : $default;
+        } else if (is_array($data)) {
+            $value = isset($data[$name]) ? $data[$name] : $default;
+        } else {
+            $value = $default;
+        }
+        return $value;
+    }
+}
 
 if (!function_exists('create_form')) {
     
