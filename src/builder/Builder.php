@@ -406,7 +406,7 @@ abstract class Builder
             $url = Request::scheme() . ':' . $url;
         } else if (strpos($url, '/') === 0) {
             $url = Request::domain() . $url;
-        } else if (strpos($url, '__assets__/') === 0) {
+        } else if (strpos($url, '__builder_assets__/') === 0) {
             $base = Request::scheme() . '://' . Request::server('HTTP_HOST') . Request::server('PHP_SELF');
             $url = $base . '?action=get_assets_common&create_builder_url=' . $url;
         } else {
@@ -429,7 +429,7 @@ abstract class Builder
         $url = strtolower($url);
         $path = $this->rootPath;
         if ($action === 'get_assets_common') {
-            $url = str_replace('__assets__/', '', $url);
+            $url = str_replace('__builder_assets__/', '', $url);
             $path = $this->assetPath;
         }
         $ext = pathinfo($url, PATHINFO_EXTENSION);
