@@ -1,7 +1,4 @@
 /.idea
 /vendor/
-/app/
-/kelove/
-/test/
 /public/
 /composer.lock
