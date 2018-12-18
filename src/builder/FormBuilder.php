@@ -14,6 +14,7 @@ namespace itxq\builder;
 
 use think\Exception;
 use think\facade\Request;
+use think\Response;
 
 /**
  * 表单构建器
@@ -111,7 +112,8 @@ class FormBuilder extends Builder
         $this->html .= $html;
         $this->addBootstrapValidator($redirectUrl);
         if (Request::isPost()) {
-            halt(Request::post());
+            Response::create(['code' => 1, 'msg' => '成功', 'data' => Request::post()],'json',200)->send();
+            exit();
         }
         return $this;
     }

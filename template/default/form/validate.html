@@ -29,7 +29,7 @@
                             alertNotify(re.msg, 'success');
                             var redirectUrl = '<{$redirect_url}>';
                             redirectUrl = (redirectUrl === '') ? re.url : redirectUrl;
-                            if (redirectUrl !== '') {
+                            if (typeof redirectUrl !== 'undefined' && redirectUrl !== '') {
                                 setTimeout(function () {
                                     window.location.href = redirectUrl;
                                 }, 1000);
@@ -37,6 +37,7 @@
                         } else {
                             alertNotify(re.msg, 'danger');
                         }
+                        $(formId)[0].reset();
                         $(formId).bootstrapValidator('resetForm');
                         $(formId).bootstrapValidator('disableSubmitButtons', false);
                     },

@@ -22,6 +22,7 @@ return [
         '__builder_assets__/bootstrapvalidator-0.5.3/css/style.min.css'
     ],
     'form.js'       => [
+        '__builder_assets__/bootstrap-notify/bootstrap-notify.min.js',
         '__builder_assets__/bootstrapvalidator-0.5.3/js/bootstrapValidator.min.js',
         '__builder_assets__/bootstrapvalidator-0.5.3/js/language/zh_CN.js',
         '__builder_assets__/bootstrapvalidator-0.5.3/js/script.min.js'
