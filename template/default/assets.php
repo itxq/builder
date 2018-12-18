@@ -31,5 +31,14 @@ return [
     'sortable.js'   => [
         '__builder_assets__/Sortable-1.8.0-rc1/Sortable.min.js',
         '__builder_assets__/Sortable-1.8.0-rc1/script.min.js',
-    ]
+    ],
+    /* ------------------------------- select2 --------------------------------------------------- */
+    'select2.js'    => [
+        '__builder_assets__/select2-4.0.6-rc.1/js/select2.min.js',
+        '__builder_assets__/select2-4.0.6-rc.1/js/i18n\zh-CN.js',
+    ],
+    'select2.css'   => [
+        '__builder_assets__/select2-4.0.6-rc.1/css/select2.min.css',
+        '__builder_assets__/select2-4.0.6-rc.1/css/style.min.css',
+    ],
 ];

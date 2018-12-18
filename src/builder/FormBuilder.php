@@ -112,7 +112,7 @@ class FormBuilder extends Builder
         $this->html .= $html;
         $this->addBootstrapValidator($redirectUrl);
         if (Request::isPost()) {
-            Response::create(['code' => 1, 'msg' => '成功', 'data' => Request::post()],'json',200)->send();
+            Response::create(['code' => 1, 'msg' => '成功', 'data' => Request::post()], 'json', 200)->send();
             exit();
         }
         return $this;
@@ -124,6 +124,22 @@ class FormBuilder extends Builder
      */
     public function addHr() {
         $this->curHtml = '<hr style="height: 0;width: 100%;margin: 0;padding: 0;color: transparent;border: 0;">';
+        $this->html .= $this->curHtml;
+        return $this;
+    }
+    
+    /**
+     * 添加表单验证令牌
+     * @param string|array $name - 令牌名称
+     * @param mixed $tokenType - 令牌生成方法
+     * @return FormBuilder
+     */
+    public function addToken($name = '__token__', $tokenType = 'md5') {
+        if (is_array($name)) {
+            $tokenType = get_sub_value('token_type', $name, 'md5');
+            $name = get_sub_value('name', $name, '__token__');
+        }
+        $this->curHtml = Request::token($name, $tokenType);
         $this->html .= $this->curHtml;
         return $this;
     }
@@ -364,6 +380,51 @@ class FormBuilder extends Builder
         ];
         $this->assign($assign);
         $content = $this->fetch('checkbox');
+        $this->curHtml = $this->addItem($id, $name, $content, $title, $validate, $help, $itemCol);
+        return $this;
+    }
+    
+    /**
+     * 添加下拉选项框
+     * @param $name
+     * @param array $list 多选列表
+     * @param string $title
+     * @param array $validate - 字段验证
+     * @param bool $isMultiple - 是否多选
+     * @param bool $isInput - 是否支持手动输入
+     * @param string $placeholder - 提示语句
+     * @param string $help - 提示语句
+     * @param int $itemCol - 默认表单项宽度
+     * @throws Exception
+     * @return FormBuilder
+     */
+    public function addSelect($name, string $title = '', array $list = [], array $validate = [],string $placeholder = '',  string $help = '', bool $isMultiple = false, bool $isInput = false, int $itemCol = 12) {
+        if (is_array($name)) {
+            $itemCol = get_sub_value('width', $name, $itemCol);
+            $placeholder = get_sub_value('placeholder', $name, '');
+            $help = get_sub_value('help', $name, '');
+            $isInput = get_sub_value('is_input', $name, false);
+            $isMultiple = get_sub_value('is_multiple', $name, false);
+            $validate = get_sub_value('validate', $name, []);
+            $list = get_sub_value('list', $name, []);
+            $title = get_sub_value('title', $name, '');
+            $name = get_sub_value('name', $name, '');
+        }
+        $this->autoloadAssets('select2', 'all');
+        $value = str_replace('"', '\'', $this->getFormData($name, ''));
+        $list = $this->unSerialize($list);
+        $id = $this->formConfig['form_id'] . '_' . $name;
+        $assign = [
+            'name'        => $name,
+            'id'          => $id,
+            'value'       => $value,
+            'placeholder' => addslashes(strip_tags($placeholder)),
+            'list'        => $list,
+            'is_multiple' => ($isMultiple == true) ? true : false,
+            'tags'        => ($isInput == true) ? true : false
+        ];
+        $this->assign($assign);
+        $content = $this->fetch('select');
         $this->curHtml = $this->addItem($id, $name, $content, $title, $validate, $help, $itemCol);
         return $this;
     }

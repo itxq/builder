@@ -1,0 +1,33 @@
+.builder-create-form .select2-container {
+    width: 100% !important; outline: none;
+    display: block;
+    height: calc(2.25rem + 2px);
+    padding: .375rem .75rem;
+    font-size: 1rem;
+    line-height: 1.5;
+    color: #495057;
+    background-color: #FFF;
+    background-clip: padding-box;
+    border: 1px solid #CED4DA;
+    border-radius: .25rem;
+    transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+}
+
+.builder-create-form .select2-selection, .select2-container input { outline: none; }
+
+.builder-create-form .select2-container .select2-selection--single,
+.builder-create-form .select2-selection,
+.builder-create-form .select2-selection.select2-selection--multiple {border: none;height: inherit;}
+
+.builder-create-form .select2-container .select2-selection__rendered {display: block;line-height: inherit;}
+
+.builder-create-form .select2-container .select2-selection--single .select2-selection__arrow {height: 100%;}
+
+.builder-create-form .select2-container.select2-container--open {z-index: 999999;}
+
+.builder-create-form .select2-container .select2-selection--multiple {min-height: 0;}
+
+.builder-create-form .select2-container--default .select2-selection--multiple .select2-selection__clear {margin-top: 0;margin-right: 0; }
+
+.builder-create-form .select2-container--default .select2-selection--multiple .select2-selection__choice,
+.builder-create-form .select2-container .select2-search--inline .select2-search__field {margin-top: 0;border: none;}

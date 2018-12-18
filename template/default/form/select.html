@@ -1,0 +1,24 @@
+<select class="form-control select2-item" name="<{$name}>" id="<{$id}>"
+<{if $is_multiple == true}>multiple="multiple" style="display: none;"<{/if}>>
+<{foreach name="list" item="v" key="k" }>
+<{if $k == $value}>
+<option value="<{$k}>" selected="selected"><{$v}></option>
+<{else/}>
+<option value="<{$k}>"><{$v}></option>
+<{/if}>
+<{/foreach}>
+</select>
+<{:builder_event_listen($js_hook, function () use($id,$tags,$placeholder) {
+return <<<EXO
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('#{$id}').select2({
+            language: 'zh-CN',
+            tags: '{$tags}',
+            placeholder: '{$placeholder}',
+            allowClear: true
+        });
+    });
+</script>
+EXO;
+})}>
