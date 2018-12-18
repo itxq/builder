@@ -174,8 +174,7 @@ class FormBuilder extends Builder
             'name'        => $name,
             'id'          => $id,
             'value'       => $value,
-            'placeholder' => addslashes(strip_tags($placeholder)),
-            'help'        => $help,
+            'placeholder' => addslashes(strip_tags($placeholder))
         ];
         $this->assign($assign);
         $content = $this->fetch('input');
@@ -203,6 +202,81 @@ class FormBuilder extends Builder
             $title = get_sub_value('title', $name, '');
             $name = get_sub_value('name', $name, '');
         }
+        $this->autoloadAssets('sortable', 'js');
+        $value = $this->unSerialize($this->getFormData($name, []), false);
+        $id = $this->formConfig['form_id'] . '_' . $name;
+        $assign = [
+            'name'        => $name,
+            'id'          => $id,
+            'value'       => $value,
+            'placeholder' => addslashes(strip_tags($placeholder))
+        ];
+        $this->assign($assign);
+        $content = $this->fetch('input-list');
+        $this->curHtml = $this->addItem($id, $name, $content, $title, $validate, $help, $itemCol);
+        return $this;
+    }
+    
+    /**
+     * 添加多行文本域
+     * @param $name - name
+     * @param string $title - 标题
+     * @param int $rows - 行数
+     * @param array $validate - 字段验证
+     * @param string $placeholder - 提示语句
+     * @param string $help - 提示语句
+     * @param int $itemCol - 默认表单项宽度
+     * @throws Exception
+     * @return FormBuilder
+     */
+    public function addTextArea($name, string $title = '', array $validate = [], string $placeholder = '', string $help = '', int $rows = 4, int $itemCol = 12) {
+        if (is_array($name)) {
+            $itemCol = get_sub_value('width', $name, $itemCol);
+            $rows = get_sub_value('rows', $name, 4);
+            $placeholder = get_sub_value('placeholder', $name, '');
+            $help = get_sub_value('help', $name, '');
+            $validate = get_sub_value('validate', $name, []);
+            $title = get_sub_value('title', $name, '');
+            $name = get_sub_value('name', $name, '');
+        }
+        $value = $this->getFormData($name, '');
+        $id = $this->formConfig['form_id'] . '_' . $name;
+        $assign = [
+            'name'        => $name,
+            'id'          => $id,
+            'value'       => $value,
+            'placeholder' => addslashes(strip_tags($placeholder)),
+            'rows'        => $rows
+        ];
+        $this->assign($assign);
+        $content = $this->fetch('textarea');
+        $this->curHtml = $this->addItem($id, $name, $content, $title, $validate, $help, $itemCol);
+        return $this;
+    }
+    
+    /**
+     * 添加多行文本域列表
+     * @param $name - name
+     * @param string $title - 标题
+     * @param int $rows - 行数
+     * @param array $validate - 字段验证
+     * @param string $placeholder - 提示语句
+     * @param string $help - 提示语句
+     * @param int $itemCol - 默认表单项宽度
+     * @throws Exception
+     * @return FormBuilder
+     */
+    public function addTextAreas($name, string $title = '', array $validate = [], string $placeholder = '', string $help = '', int $rows = 4, int $itemCol = 12) {
+        if (is_array($name)) {
+            $itemCol = get_sub_value('width', $name, $itemCol);
+            $rows = get_sub_value('rows', $name, 4);
+            $placeholder = get_sub_value('placeholder', $name, '');
+            $help = get_sub_value('help', $name, '');
+            $validate = get_sub_value('validate', $name, []);
+            $title = get_sub_value('title', $name, '');
+            $name = get_sub_value('name', $name, '');
+        }
+        $this->autoloadAssets('sortable', 'js');
         $value = $this->unSerialize($this->getFormData($name, []), false);
         $id = $this->formConfig['form_id'] . '_' . $name;
         $assign = [
@@ -210,10 +284,10 @@ class FormBuilder extends Builder
             'id'          => $id,
             'value'       => $value,
             'placeholder' => addslashes(strip_tags($placeholder)),
-            'help'        => $help,
+            'rows'        => $rows
         ];
         $this->assign($assign);
-        $content = $this->fetch('input-list');
+        $content = $this->fetch('textarea-list');
         $this->curHtml = $this->addItem($id, $name, $content, $title, $validate, $help, $itemCol);
         return $this;
     }

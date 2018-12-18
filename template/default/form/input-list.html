@@ -1,27 +1,30 @@
 <div class="input-group form-json-group">
     <div class="form-json-group-demo">
-        <div class="input-group form-json-item">
+        <div class="form-json-item">
             <input type="text" name="<{$name}>[]" placeholder="<{$placeholder|default=''}>" class="form-control" disabled>
-            <span class="input-group-btn">
-                <button class="btn btn-danger form-json-delete" type="button">&nbsp;-&nbsp;</button>
+            <span class="input-group-btn-fixed">
+                 <span class="btn btn-info">↑↓</span>
+                 <button class="btn btn-danger form-json-delete" type="button">&nbsp;-&nbsp;</button>
             </span>
         </div>
     </div>
     <div class="form-json-group-core">
         <{if count($value) <1 }>
-        <div class="input-group form-json-item">
+        <div class="form-json-item">
             <input type="text" name="<{$name}>[]" placeholder="<{$placeholder|default=''}>" class="form-control">
-            <span class="input-group-btn">
-                <button class="btn btn-danger form-json-delete" type="button">&nbsp;-&nbsp;</button>
+            <span class="input-group-btn-fixed">
+                 <span class="btn btn-info">↑↓</span>
+                 <button class="btn btn-danger form-json-delete" type="button">&nbsp;-&nbsp;</button>
             </span>
         </div>
         <{else/}>
         <{foreach $value as $k=>$v}>
-        <div class="input-group form-json-item">
+        <div class="form-json-item">
             <input type="text" name="<{$name}>[]" placeholder="<{$placeholder|default=''}>" class="form-control" value="<{$v}>">
-            <span class="input-group-btn">
-            <button class="btn btn-danger form-json-delete" type="button">&nbsp;-&nbsp;</button>
-        </span>
+            <span class="input-group-btn-fixed">
+                 <span class="btn btn-info">↑↓</span>
+                 <button class="btn btn-danger form-json-delete" type="button">&nbsp;-&nbsp;</button>
+            </span>
         </div>
         <{/foreach}>
         <{/if}>

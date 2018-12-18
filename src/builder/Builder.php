@@ -403,17 +403,19 @@ abstract class Builder
         $tplReplaceString = array_merge((array)Config::get('template.tpl_replace_string'), get_sub_value('tpl_replace_string', $this->viewConfig, []));
         $url = str_replace(array_keys($tplReplaceString), array_values($tplReplaceString), $url);
         if (strpos($url, '//') === 0) {
-            $url = Request::scheme() . ':' . $url;
+            $trueUrl = Request::scheme() . ':' . $url;
         } else if (strpos($url, '/') === 0) {
-            $url = Request::domain() . $url;
+            $trueUrl = Request::domain() . $url;
         } else if (strpos($url, '__builder_assets__/') === 0) {
             $base = Request::scheme() . '://' . Request::server('HTTP_HOST') . Request::server('PHP_SELF');
-            $url = $base . '?action=get_assets_common&create_builder_url=' . $url;
+            $trueUrl = $base . '?action=get_assets_common&create_builder_url=' . $url;
+        } else if (strpos($url, 'http://') === 0 || strpos($url, 'https://') === 0) {
+            $trueUrl = $url;
         } else {
             $base = Request::scheme() . '://' . Request::server('HTTP_HOST') . Request::server('PHP_SELF');
-            $url = $base . '?action=get_assets&create_builder_url=' . $url;
+            $trueUrl = $base . '?action=get_assets&create_builder_url=' . $url;
         }
-        return $url;
+        return $trueUrl;
     }
     
     /**

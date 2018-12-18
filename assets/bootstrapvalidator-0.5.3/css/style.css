@@ -10,9 +10,13 @@
 
 .builder-create-form .form-json-group-demo {display: none;}
 
-.builder-create-form .form-json-group-core {width: 100%;}
+.builder-create-form .form-json-group-core {width: 100%;position: relative;}
 
-.builder-create-form .form-json-group-core .form-json-item {margin-bottom: 10px;}
+.builder-create-form .form-json-group-core .form-json-item {margin-bottom: 10px;position: relative;}
+
+.builder-create-form .form-json-group-core .form-json-item .input-group-btn-fixed {display: none;position: absolute;top: 0;right: 0;z-index: 5;}
+
+.builder-create-form .form-json-group-core .form-json-item:hover .input-group-btn-fixed {display: block;}
 
 /* radio & checkbox 优化 */
 .builder-create-form .demo--label {margin: 5px 0;display: inline-block;cursor: pointer;line-height: 1.2;}

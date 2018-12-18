@@ -24,6 +24,11 @@ return [
     'form.js'       => [
         '__builder_assets__/bootstrapvalidator-0.5.3/js/bootstrapValidator.min.js',
         '__builder_assets__/bootstrapvalidator-0.5.3/js/language/zh_CN.js',
-        '__builder_assets__/bootstrapvalidator-0.5.3/js/script.min.js',
+        '__builder_assets__/bootstrapvalidator-0.5.3/js/script.min.js'
+    ],
+    /* ------------------------------- 拖动排序 ---------------------------------------------------------- */
+    'sortable.js'   => [
+        '__builder_assets__/jquery-ui-1.12.1/jquery-ui.min.js',
+        '__builder_assets__/jquery-ui-1.12.1/script.min.js',
     ]
 ];
