@@ -29,7 +29,7 @@ return [
     ],
     /* ------------------------------- 拖动排序 ---------------------------------------------------------- */
     'sortable.js'   => [
-        '__builder_assets__/jquery-ui-1.12.1/jquery-ui.min.js',
-        '__builder_assets__/jquery-ui-1.12.1/script.min.js',
+        '__builder_assets__/Sortable-1.8.0-rc1/Sortable.min.js',
+        '__builder_assets__/Sortable-1.8.0-rc1/script.min.js',
     ]
 ];
