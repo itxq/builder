@@ -1,5 +1,9 @@
 /* 基础设置 */
-.builder-create-form {margin-top: 1rem;overflow: hidden; }
+.builder-create-form {margin: 1rem;overflow: hidden; }
+
+.builder-create-form .form-group .control-label {padding: 0 !important;}
+
+.builder-create-form .form-group .col-md-12.control-label {text-align: left !important;}
 
 .builder-create-form .form-control, .form-control:focus {box-shadow: none !important;}
 
