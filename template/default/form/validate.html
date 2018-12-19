@@ -24,25 +24,27 @@
                     url: form.attr('action'),
                     type: '<{$method}>',
                     data: formData,
+                    dataType: 'json',
                     success: function (re) {
                         if (re.code === 1) {
+                            $(formId)[0].reset();
+                            $(formId).bootstrapValidator('resetForm');
                             alertNotify(re.msg, 'success');
                             var redirectUrl = '<{$redirect_url}>';
                             redirectUrl = (redirectUrl === '') ? re.url : redirectUrl;
                             if (typeof redirectUrl !== 'undefined' && redirectUrl !== '') {
                                 setTimeout(function () {
                                     window.location.href = redirectUrl;
-                                }, 1000);
+                                }, 1500);
                             }
                         } else {
+                            $(formId).bootstrapValidator('disableSubmitButtons', false);
                             alertNotify(re.msg, 'danger');
                         }
-                        $(formId)[0].reset();
-                        $(formId).bootstrapValidator('resetForm');
-                        $(formId).bootstrapValidator('disableSubmitButtons', false);
                     },
                     error: function () {
                         $(formId).bootstrapValidator('disableSubmitButtons', false);
+                        alertNotify('网络错误,请重试...', 'danger');
                     }
                 });
             });

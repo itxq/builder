@@ -12,9 +12,9 @@
 
 namespace itxq\builder;
 
+use itxq\tools\FormSubmit;
 use think\Exception;
 use think\facade\Request;
-use think\Response;
 
 /**
  * 表单构建器
@@ -74,7 +74,6 @@ class FormBuilder extends Builder
         $this->formData = get_sub_value('data', $config, []);
         $this->formConfig['col_width'] = get_sub_value('width', $config, 2);
         $this->autoloadAssets('form', 'all');
-        $this->autoloadAssets('switch', 'all');
     }
     
     /**
@@ -113,7 +112,7 @@ class FormBuilder extends Builder
         $this->html .= $html;
         $this->addBootstrapValidator($redirectUrl);
         if (Request::isPost()) {
-            Response::create(['code' => 1, 'msg' => '成功', 'data' => Request::post()], 'json', 200)->send();
+            FormSubmit::submit($this);
             exit();
         }
         return $this;
@@ -233,6 +232,44 @@ class FormBuilder extends Builder
         ];
         $this->assign($assign);
         $content = $this->fetch('date-range');
+        $this->curHtml = $this->addItem($id, $name, $content, $title, $validate, $help, $itemCol);
+        return $this;
+    }
+    
+    /**
+     * 添加JSON表单项
+     * @param $name - name
+     * @param string $title - 标题
+     * @param array $validate - 字段验证
+     * @param string $help - 提示语句
+     * @param int $itemCol - 默认表单项宽度
+     * @param string $keyName - 页面显示json键名称
+     * @param string $valueName - 页面显示json值名称
+     * @return FormBuilder
+     * @throws Exception
+     */
+    public function addJson($name, string $title = '', array $validate = [], string $help = '', string $keyName = '键', string $valueName = '值', int $itemCol = 12) {
+        if (is_array($name)) {
+            $itemCol = get_sub_value('width', $name, $itemCol);
+            $help = get_sub_value('help', $name, $help);
+            $validate = get_sub_value('validate', $name, $validate);
+            $title = get_sub_value('title', $name, $title);
+            $keyName = get_sub_value('key_name', $name, $keyName);
+            $valueName = get_sub_value('value_name', $name, $valueName);
+            $name = get_sub_value('name', $name, '');
+        }
+        $value = $this->unSerialize($this->getFormData($name, []), false);
+        $id = $this->createId($name, $this->formConfig['form_id']);
+        $assign = [
+            'name'      => $name,
+            'id'        => $id,
+            'value'     => $value,
+            'title'     => $title,
+            'keyName'   => $keyName,
+            'valueName' => $valueName,
+        ];
+        $this->assign($assign);
+        $content = $this->fetch('json');
         $this->curHtml = $this->addItem($id, $name, $content, $title, $validate, $help, $itemCol);
         return $this;
     }
@@ -508,7 +545,7 @@ class FormBuilder extends Builder
      * @param array $validate - 字段验证
      * @param string $help - 提示语句
      * @param int $itemCol - 默认表单项宽度
-     * @throws \Exception
+     * @throws Exception
      * @return FormBuilder
      */
     public function addSwitch($name, string $title = '', array $list = [], array $validate = [], string $help = '', int $itemCol = 12) {

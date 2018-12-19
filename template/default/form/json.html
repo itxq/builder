@@ -1,0 +1,56 @@
+<div class="input-group form-json-group">
+    <div class="form-json-group-demo">
+        <div class="input-group form-json-item">
+            <span class="input-group-btn">
+		        <button class="btn btn-info" type="button"><{$keyName}></button>
+            </span>
+            <input type="text" name="<{$name}>[json_key][]" placeholder="<{$keyName}>" class="form-control" disabled>
+            <span class="input-group-btn">
+                <button class="btn btn-info" type="button"><{$valueName}></button>
+            </span>
+            <input type="text" name="<{$name}>[json_value][]" placeholder="<{$valueName}>" class="form-control" disabled>
+            <span class="input-group-btn">
+                <button class="btn btn-danger form-json-delete" type="button">&nbsp;-&nbsp;</button>
+            </span>
+        </div>
+    </div>
+    <div class="form-json-group-core">
+        <{if count($value) <1 }>
+        <div class="input-group form-json-item">
+            <span class="input-group-btn">
+	        	<button class="btn btn-info" type="button"><{$keyName|default='键'}></button>
+            </span>
+            <input type="text" name="<{$name}>[json_key][]" placeholder="<{$keyName}>" class="form-control">
+            <span class="input-group-btn">
+                 <button class="btn btn-info" type="button"><{$valueName}></button>
+            </span>
+            <input type="text" name="<{$name}>[json_value][]" placeholder="<{$valueName}>" class="form-control">
+            <span class="input-group-btn">
+                <button class="btn btn-danger form-json-delete" type="button">&nbsp;-&nbsp;</button>
+            </span>
+        </div>
+        <{else/}>
+        <{foreach $value as $k=>$v}>
+        <div class="input-group form-json-item">
+            <span class="input-group-btn">
+	        	<button class="btn btn-info" type="button"><{$keyName}></button>
+            </span>
+            <input type="text" name="<{$name}>[json_key][]" placeholder="<{$keyName}>" class="form-control" value="<{$k}>">
+            <span class="input-group-btn">
+                 <button class="btn btn-info" type="button"><{$valueName}></button>
+            </span>
+            <input type="text" name="<{$name}>[json_value][]" placeholder="<{$valueName}>" class="form-control" value="<{$v}>">
+            <span class="input-group-btn">
+            <button class="btn btn-danger form-json-delete" type="button">&nbsp;-&nbsp;</button>
+        </span>
+        </div>
+        <{/foreach}>
+        <{/if}>
+    </div>
+    <span class="form-json-group-add">
+         <button class="btn btn-primary form-json-add" type="button">
+             追加
+         </button>
+    </span>
+</div>
+<input type="hidden" name="build_form_type[<{$name}>]" value="json">
