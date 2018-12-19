@@ -74,7 +74,7 @@ class FormBuilder extends Builder
         $this->formData = get_sub_value('data', $config, []);
         $this->formConfig['col_width'] = get_sub_value('width', $config, 2);
         $this->autoloadAssets('form', 'all');
-        $this->autoloadAssets('daterangepicker', 'all');
+        $this->autoloadAssets('switch', 'all');
     }
     
     /**
@@ -157,7 +157,7 @@ class FormBuilder extends Builder
         }
         $assign = [
             'name'  => $name,
-            'id'    => $this->formConfig['form_id'] . '_' . $name,
+            'id'    => $this->createId($name, $this->formConfig['form_id']),
             'value' => str_replace('"', '\'', $this->getFormData($name, ''))
         ];
         $this->assign($assign);
@@ -186,7 +186,7 @@ class FormBuilder extends Builder
             $name = get_sub_value('name', $name, '');
         }
         $value = str_replace('"', '\'', $this->getFormData($name, ''));
-        $id = $this->formConfig['form_id'] . '_' . $name;
+        $id = $this->createId($name, $this->formConfig['form_id']);
         $assign = [
             'name'        => $name,
             'id'          => $id,
@@ -219,9 +219,10 @@ class FormBuilder extends Builder
             $title = get_sub_value('title', $name, '');
             $name = get_sub_value('name', $name, '');
         }
+        $this->autoloadAssets('daterangepicker', 'all');
         $value = str_replace('"', '\'', $this->getFormData($name, ''));
         $time = explode('~', $value);
-        $id = $this->formConfig['form_id'] . '_' . $name;
+        $id = $this->createId($name, $this->formConfig['form_id']);
         $assign = [
             'name'        => $name,
             'id'          => $id,
@@ -257,7 +258,7 @@ class FormBuilder extends Builder
             $name = get_sub_value('name', $name, '');
         }
         $value = str_replace('"', '\'', $this->getFormData($name, ''));
-        $id = $this->formConfig['form_id'] . '_' . $name;
+        $id = $this->createId($name, $this->formConfig['form_id']);
         $assign = [
             'name'        => $name,
             'id'          => $id,
@@ -292,7 +293,7 @@ class FormBuilder extends Builder
         }
         $this->autoloadAssets('sortable', 'js');
         $value = $this->unSerialize($this->getFormData($name, []), false);
-        $id = $this->formConfig['form_id'] . '_' . $name;
+        $id = $this->createId($name, $this->formConfig['form_id']);
         $assign = [
             'name'        => $name,
             'id'          => $id,
@@ -328,7 +329,7 @@ class FormBuilder extends Builder
             $name = get_sub_value('name', $name, '');
         }
         $value = $this->getFormData($name, '');
-        $id = $this->formConfig['form_id'] . '_' . $name;
+        $id = $this->createId($name, $this->formConfig['form_id']);
         $assign = [
             'name'        => $name,
             'id'          => $id,
@@ -366,7 +367,7 @@ class FormBuilder extends Builder
         }
         $this->autoloadAssets('sortable', 'js');
         $value = $this->unSerialize($this->getFormData($name, []), false);
-        $id = $this->formConfig['form_id'] . '_' . $name;
+        $id = $this->createId($name, $this->formConfig['form_id']);
         $assign = [
             'name'        => $name,
             'id'          => $id,
@@ -402,7 +403,7 @@ class FormBuilder extends Builder
         }
         $value = $this->getFormData($name, false);
         $list = $this->unSerialize($list);
-        $id = $id = $this->formConfig['form_id'] . '_' . $name;
+        $id = $id = $this->createId($name, $this->formConfig['form_id']);
         $list_key = array_keys($list);
         if ($value === false || !in_array($value, $list_key)) {
             $value = $list_key[0];
@@ -441,7 +442,7 @@ class FormBuilder extends Builder
         }
         $value = $this->unSerialize($this->getFormData($name, []));
         $list = $this->unSerialize($list);
-        $id = $this->formConfig['form_id'] . '_' . $name;
+        $id = $this->createId($name, $this->formConfig['form_id']);
         $assign = [
             'name'        => $name,
             'value'       => $value,
@@ -481,7 +482,7 @@ class FormBuilder extends Builder
         $this->autoloadAssets('select', 'all');
         $value = $this->unSerialize($this->getFormData($name, ''));
         $list = $this->unSerialize($list);
-        $id = $this->formConfig['form_id'] . '_' . $name;
+        $id = $this->createId($name, $this->formConfig['form_id']);
         $listValue = array_values($list);
         $isGroup = isset($listValue[0]) && is_array($listValue[0]) ? true : false;
         $assign = [
@@ -500,6 +501,46 @@ class FormBuilder extends Builder
     }
     
     /**
+     * 添加switch开关
+     * @param $name - name值
+     * @param string $title - 标题
+     * @param $list - 可选项列表
+     * @param array $validate - 字段验证
+     * @param string $help - 提示语句
+     * @param int $itemCol - 默认表单项宽度
+     * @throws \Exception
+     * @return FormBuilder
+     */
+    public function addSwitch($name, string $title = '', array $list = [], array $validate = [], string $help = '', int $itemCol = 12) {
+        if (is_array($name)) {
+            $itemCol = get_sub_value('width', $name, $itemCol);
+            $help = get_sub_value('help', $name, '');
+            $validate = get_sub_value('validate', $name, []);
+            $list = get_sub_value('list', $name, []);
+            $title = get_sub_value('title', $name, '');
+            $name = get_sub_value('name', $name, '');
+        }
+        $this->autoloadAssets('switch', 'all');
+        $value = $this->getFormData($name, '');
+        $list = $this->unSerialize($list, false);
+        $id = $this->createId($name, $this->formConfig['form_id']);
+        $off = get_sub_value(0, array_values($list), 0);
+        $on = get_sub_value(1, array_values($list), 1);
+        $assign = [
+            'name'        => $name,
+            'id'          => $id,
+            'placeholder' => addslashes(strip_tags($help)),
+            'value'       => empty($value) ? 0 : $value,
+            'off'         => empty($off) ? 0 : $off,
+            'on'          => empty($on) ? 0 : $on,
+        ];
+        $this->assign($assign);
+        $content = $this->fetch('switch');
+        $this->curHtml = $this->addItem($id, $name, $content, $title, $validate, $help, $itemCol);
+        return $this;
+    }
+    
+    /**
      * 添加 表单提交按钮
      * @param string $btnTitle - 按钮标题
      * @param string $btnType - 按钮类型(submit/button)
@@ -507,7 +548,7 @@ class FormBuilder extends Builder
      * @return FormBuilder
      */
     public function addSubmitBtn(string $btnTitle = '提交表单', string $btnType = 'submit') {
-        $id = $this->formConfig['form_id'] . '_' . $btnType;
+        $id = $this->createId($btnType, $this->formConfig['form_id']);
         $assign = [
             'btn_title' => $btnTitle,
             'btn_type'  => $btnType,
@@ -528,7 +569,7 @@ class FormBuilder extends Builder
      * @return FormBuilder
      */
     public function addResetBtn(string $btnTitle = '重置表单') {
-        $id = $this->formConfig['form_id'] . '_reset';
+        $id = $this->createId('reset', $this->formConfig['form_id']);
         $this->assign(['btn_title' => $btnTitle, 'id' => $id]);
         $html = $this->fetch('btn-reset');
         $this->curHtml = $html;

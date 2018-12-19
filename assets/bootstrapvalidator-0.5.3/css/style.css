@@ -38,3 +38,6 @@
 .builder-create-form .demo--radio:checked + .demo--radioInput:after {background-color: #57AD68;}
 
 .builder-create-form .demo--checkbox.demo--radioInput, .demo--radio:checked + .demo--checkbox.demo--radioInput:after {border-radius: 0;}
+
+/* bootstrap-switch */
+.builder-create-form .bootstrap-switch.bootstrap-switch-focused {box-shadow: none; }

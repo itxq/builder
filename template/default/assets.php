@@ -50,4 +50,11 @@ return [
         '__builder_assets__/daterangepicker-3.0.3/daterangepicker.js',
         '__builder_assets__/daterangepicker-3.0.3/script.min.js',
     ],
+    'switch.css'          => [
+        '__builder_assets__/bootstrap-switch-4.0.0-alpha.1/css/bootstrap-switch.min.css'
+    ],
+    'switch.js'           => [
+        '__builder_assets__/bootstrap-switch-4.0.0-alpha.1/js/bootstrap-switch.min.js',
+        '__builder_assets__/bootstrap-switch-4.0.0-alpha.1/js/script.min.js',
+    ],
 ];

@@ -237,6 +237,8 @@ abstract class Builder
                 $list = unserialize($list);
             } else if (preg_match('/^\<\{\:serialize.*?\}\>$/', $list) || preg_match('/^\<\{.*?\}\>$/', $list)) {
                 $list = $this->unSerialize($this->display($list));
+            } else if (empty($list)) {
+                $list = [];
             } else {
                 $list = explode(',', $list);
             }
@@ -296,15 +298,15 @@ abstract class Builder
     /**
      * 创建ID
      * @param string $name - 名称
-     * @param bool $isRound - 是否添加随机数
+     * @param bool|string $isRound - 是否添加随机数(true添加，为字符串时表示前缀)
      * @return mixed
      */
-    protected function createId(string $name, bool $isRound = true) {
-        $prefix = 'builder_auto_create_';
+    protected function createId(string $name, $isRound = true) {
+        $prefix = is_string($isRound) ? $isRound : 'builder_auto_create_';
         $search = ['[', ']'];
         $replace = ['_', '_'];
         $name = $prefix . str_replace($search, $replace, $name);
-        return $isRound ? ($name . cm_round(4, 'all')) : $name;
+        return $isRound === true ? ($name . $this->cmRound(4, 'all')) : $name;
     }
     
     /**
@@ -369,6 +371,7 @@ abstract class Builder
     }
     
     /**
+     * 拼装css & js 资源
      * @param string $assetsName
      * @param array $config
      * @param string $type
@@ -454,5 +457,33 @@ abstract class Builder
             throw new HttpException(404, '资源文件不存在');
         }
         exit(file_get_contents($path));
+    }
+    
+    /**
+     * 生成随机字符串
+     * @param int $length - 指定生成字符串的长度
+     * @param string $type - 指定生成字符串的类型（all-全部，num-纯数字，letter-纯字母）
+     * @return null|string
+     */
+    protected function cmRound(int $length = 4, string $type = 'all') {
+        $str = '';
+        $strUp = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        $strLow = 'abcdefghijklmnopqrstuvwxyz';
+        $number = '0123456789';
+        switch ($type) {
+            case 'num':
+                $strPol = $number;
+                break;
+            case 'letter':
+                $strPol = $strUp . $strLow;
+                break;
+            default:
+                $strPol = $strUp . $number . $strLow;
+        }
+        $max = strlen($strPol) - 1;
+        for ($i = 0; $i < $length; $i++) {
+            $str .= $strPol[mt_rand(0, $max)];
+        }
+        return $str;
     }
 }
