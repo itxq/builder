@@ -1,6 +1,8 @@
 /* 基础设置 */
 .builder-create-form {margin: 1rem;overflow: hidden; }
 
+.builder-create-form .btn.focus, .btn:focus {outline: 0;box-shadow: none !important;}
+
 .builder-create-form .form-group .control-label {padding-top: .375rem !important;}
 
 .builder-create-form .form-group .col-md-12.control-label {text-align: left !important;}

@@ -275,6 +275,43 @@ class FormBuilder extends Builder
     }
     
     /**
+     * 添加颜色选择器
+     * @param $name - name
+     * @param string $title - 标题
+     * @param string $type - 颜色类型 hex | rgb | rgba.
+     * @param array $validate - 字段验证
+     * @param string $help - 提示语句
+     * @param int $itemCol - 默认表单项宽度
+     * @throws Exception
+     * @return FormBuilder
+     */
+    public function addColor($name, string $title = '', string $type = 'rgba', array $validate = [], string $placeholder = '', string $help = '', int $itemCol = 12) {
+        if (is_array($name)) {
+            $itemCol = get_sub_value('width', $name, $itemCol);
+            $help = get_sub_value('help', $name, '');
+            $placeholder = get_sub_value('placeholder', $name, '');
+            $validate = get_sub_value('validate', $name, []);
+            $title = get_sub_value('title', $name, '');
+            $type = get_sub_value('list', $name, $type);
+            $name = get_sub_value('name', $name, '');
+        }
+        $this->autoloadAssets('color', 'all');
+        $value = str_replace('"', '\'', $this->getFormData($name, ''));
+        $id = $this->createId($name);
+        $assign = [
+            'name'        => $name,
+            'id'          => $id,
+            'value'       => $value,
+            'format'      => $type,
+            'placeholder' => addslashes(strip_tags($placeholder))
+        ];
+        $this->assign($assign);
+        $content = $this->fetch('color');
+        $this->curHtml = $this->addItem($id, $name, $content, $title, $validate, $help, $itemCol);
+        return $this;
+    }
+    
+    /**
      * 添加单行文本框
      * @param $name - name
      * @param string $title - 标题

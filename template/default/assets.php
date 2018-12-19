@@ -50,11 +50,19 @@ return [
         '__builder_assets__/daterangepicker-3.0.3/daterangepicker.js',
         '__builder_assets__/daterangepicker-3.0.3/script.min.js',
     ],
+    /* ------------------------------- bootstrap-switch ------------------------------------------ */
     'switch.css'          => [
         '__builder_assets__/bootstrap-switch-4.0.0-alpha.1/css/bootstrap-switch.min.css'
     ],
     'switch.js'           => [
         '__builder_assets__/bootstrap-switch-4.0.0-alpha.1/js/bootstrap-switch.min.js',
         '__builder_assets__/bootstrap-switch-4.0.0-alpha.1/js/script.min.js',
+    ],
+    /* ------------------------------- 颜色选择器 ------------------------------------------ */
+    'color.css'           => [
+        '__builder_assets__/bootstrap-colorpicker-3.0.0-beta.1/css/bootstrap-colorpicker.min.css'
+    ],
+    'color.js'            => [
+        '__builder_assets__/bootstrap-colorpicker-3.0.0-beta.1/js/bootstrap-colorpicker.min.js'
     ],
 ];
