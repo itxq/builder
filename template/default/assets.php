@@ -65,4 +65,14 @@ return [
     'color.js'            => [
         '__builder_assets__/bootstrap-colorpicker-3.0.0-beta.1/js/bootstrap-colorpicker.min.js'
     ],
+    /* ------------------------------- 标签输入框插件 ------------------------------------------------- */
+    'tags.js'             => [
+        //  标签输入框 插件
+        '__builder_assets__/bootstrap-tagsinput-0.8.0/bootstrap-tagsinput.min.js',
+        '__builder_assets__/bootstrap-tagsinput-0.8.0/script.min.js',
+    ],
+    'tags.css'            => [
+        // tags输入框插件
+        '__builder_assets__/bootstrap-tagsinput-0.8.0/bootstrap-tagsinput.css',
+    ],
 ];

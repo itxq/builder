@@ -43,3 +43,20 @@
 
 /* bootstrap-switch */
 .builder-create-form .bootstrap-switch.bootstrap-switch-focused {box-shadow: none; }
+
+/* bootstrap-tagsinput */
+.builder-create-form .bootstrap-tagsinput {width: 100% !important; outline: none;
+    display: block;
+    height: calc(2.25rem + 2px);
+    padding: .375rem .75rem;
+    font-size: 1rem;
+    line-height: 1.5;
+    color: #495057;
+    background-color: #FFF;
+    background-clip: padding-box;
+    border: 1px solid #CED4DA;
+    border-radius: .25rem;
+    transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+}
+
+.builder-create-form .bootstrap-tagsinput .tag {margin: 2px 0;padding-top: 0;padding-bottom: 0; }

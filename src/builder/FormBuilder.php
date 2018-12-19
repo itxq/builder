@@ -277,6 +277,42 @@ class FormBuilder extends Builder
     }
     
     /**
+     * 添加标签输入框
+     * @param $name - name
+     * @param string $title - 标题
+     * @param array $validate - 字段验证
+     * @param string $placeholder - 提示语句
+     * @param string $help - 提示语句
+     * @param int $itemCol - 默认表单项宽度
+     * @throws Exception
+     * @return FormBuilder
+     */
+    public function addTags($name, string $title = '', array $validate = [], string $placeholder = '', string $help = '', int $itemCol = 12) {
+        if (is_array($name)) {
+            $itemCol = get_sub_value('width', $name, $itemCol);
+            $placeholder = get_sub_value('placeholder', $name, '');
+            $help = get_sub_value('help', $name, '');
+            $validate = get_sub_value('validate', $name, []);
+            $title = get_sub_value('title', $name, '');
+            $name = get_sub_value('name', $name, '');
+        }
+        $this->autoloadAssets('tags', 'all');
+        $value = str_replace('"', '\'', $this->getFormData($name, ''));
+        $id = $this->createId($name, $this->formConfig['form_id']);
+        $assign = [
+            'name'  => $name,
+            'id'    => $id,
+            'value' => $value,
+            'title' => $title,
+            'placeholder' => addslashes(strip_tags($placeholder))
+        ];
+        $this->assign($assign);
+        $content = $this->fetch('tags');
+        $this->curHtml = $this->addItem($id, $name, $content, $title, $validate, $help, $itemCol);
+        return $this;
+    }
+    
+    /**
      * 添加颜色选择器
      * @param $name - name
      * @param string $title - 标题
@@ -300,7 +336,7 @@ class FormBuilder extends Builder
         }
         $this->autoloadAssets('color', 'all');
         $value = str_replace('"', '\'', $this->getFormData($name, ''));
-        $id = $this->createId($name);
+        $id = $this->createId($name, $this->formConfig['form_id']);
         $assign = [
             'name'        => $name,
             'id'          => $id,
