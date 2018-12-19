@@ -97,13 +97,13 @@ function checkShowOrHide(_val, value, targetName) {
 /* 密码框显示/隐藏 */
 $(document).on('click', '.password-input .password-controller', function () {
     var obj = $(this).parent('.input-group-btn').siblings('input.form-control');
-    var controllerObj = $(this).find('i.fa');
+    var controllerObj = $(this);
     if (obj.attr('type') === 'password') {
         obj.attr('type', 'text');
-        controllerObj.removeClass('fa-eye').addClass('fa-eye-slash');
+        controllerObj.html('隐藏');
     } else {
         obj.attr('type', 'password');
-        controllerObj.removeClass('fa-eye-slash').addClass('fa-eye');
+        controllerObj.html('显示');
     }
 });
 

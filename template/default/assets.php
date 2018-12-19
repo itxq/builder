@@ -6,39 +6,48 @@
 
 return [
     /* ------------------------------- jquery ---------------------------------------------------------- */
-    'jquery.js'     => [
+    'jquery.js'           => [
         '__builder_assets__/jquery-3.3.1/jquery-3.3.1.min.js'
     ],
     /* ------------------------------- bootstrap ---------------------------------------------------------- */
-    'bootstrap.css' => [
+    'bootstrap.css'       => [
         '__builder_assets__/bootstrap-4.1.3/css/bootstrap.min.css'
     ],
-    'bootstrap.js'  => [
-        '__builder_assets__/bootstrap-4.1.3/js/bootstrap.min.js'
+    'bootstrap.js'        => [
+        '__builder_assets__/bootstrap-4.1.3/js/bootstrap.bundle.min.js'
     ],
     /* ------------------------------- 表单 ---------------------------------------------------------- */
-    'form.css'      => [
+    'form.css'            => [
         '__builder_assets__/bootstrapvalidator-0.5.3/css/bootstrapValidator.min.css',
         '__builder_assets__/bootstrapvalidator-0.5.3/css/style.min.css'
     ],
-    'form.js'       => [
+    'form.js'             => [
         '__builder_assets__/bootstrap-notify/bootstrap-notify.min.js',
         '__builder_assets__/bootstrapvalidator-0.5.3/js/bootstrapValidator.min.js',
         '__builder_assets__/bootstrapvalidator-0.5.3/js/language/zh_CN.js',
         '__builder_assets__/bootstrapvalidator-0.5.3/js/script.min.js'
     ],
     /* ------------------------------- 拖动排序 ---------------------------------------------------------- */
-    'sortable.js'   => [
+    'sortable.js'         => [
         '__builder_assets__/Sortable-1.8.0-rc1/Sortable.min.js',
         '__builder_assets__/Sortable-1.8.0-rc1/script.min.js',
     ],
-    /* ------------------------------- select2 --------------------------------------------------- */
-    'select2.js'    => [
-        '__builder_assets__/select2-4.0.6-rc.1/js/select2.min.js',
-        '__builder_assets__/select2-4.0.6-rc.1/js/i18n\zh-CN.js',
+    /* ------------------------------- select --------------------------------------------------- */
+    'select.js'           => [
+        '__builder_assets__/bootstrap-select-1.13.5/js/bootstrap-select.min.js',
+        '__builder_assets__/bootstrap-select-1.13.5/js/i18n/defaults-zh_CN.min.js',
+        '__builder_assets__/bootstrap-select-1.13.5/js/script.min.js',
     ],
-    'select2.css'   => [
-        '__builder_assets__/select2-4.0.6-rc.1/css/select2.min.css',
-        '__builder_assets__/select2-4.0.6-rc.1/css/style.min.css',
+    'select.css'          => [
+        '__builder_assets__/bootstrap-select-1.13.5/css/bootstrap-select.css',
+    ],
+    /* ------------------------------- 时间、日期范围选择 ------------------------------------------ */
+    'daterangepicker.css' => [
+        '__builder_assets__/daterangepicker-3.0.3/daterangepicker.css'
+    ],
+    'daterangepicker.js'  => [
+        '__builder_assets__/daterangepicker-3.0.3/moment.min.js',
+        '__builder_assets__/daterangepicker-3.0.3/daterangepicker.js',
+        '__builder_assets__/daterangepicker-3.0.3/script.min.js',
     ],
 ];

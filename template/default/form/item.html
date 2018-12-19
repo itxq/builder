@@ -4,7 +4,7 @@
             <label for="<{$id}>" class="col-md-<{$width==0?'12':$width}> control-label text-right">
                 <{$title}>
             </label>
-            <div class="col-md-<{$col_width}>">
+            <div class="col-md-<{$col_width==0?'12':$col_width}>">
                 <{$content|raw}>
                 <span class="help-<{$help_type|default=''}> text-info"><{$help}></span>
             </div>

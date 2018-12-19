@@ -1,0 +1,16 @@
+<input type="text" class="form-control daterangepicker-input" id="<{$id}>" name="<{$name}>" placeholder="<{$placeholder}>" value="<{$value}>">
+<input type="hidden" name="build_form_type[<{$name}>]" value="date_range">
+<{:builder_event_listen($js_hook, function () use($form_id,$id,$value,$sTime,$eTime) {
+return <<<EXO
+<script type="text/javascript">
+    var _startDate = "{$sTime}";
+    var _endDateDate = "{$eTime}";
+    var _dateRangepickerConfig = dateRangepickerConfig;
+    if (_endDateDate !== '' && _startDate !== '') {
+        _dateRangepickerConfig.startDate = _startDate;
+        _dateRangepickerConfig.endDate = _endDateDate;
+    }
+    $('#{$form_id} #{$id}').daterangepicker(_dateRangepickerConfig);
+</script>
+EXO;
+})}>

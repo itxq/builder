@@ -74,6 +74,7 @@ class FormBuilder extends Builder
         $this->formData = get_sub_value('data', $config, []);
         $this->formConfig['col_width'] = get_sub_value('width', $config, 2);
         $this->autoloadAssets('form', 'all');
+        $this->autoloadAssets('daterangepicker', 'all');
     }
     
     /**
@@ -163,6 +164,75 @@ class FormBuilder extends Builder
         $content = $this->fetch('hidden');
         $this->curHtml = $content;
         $this->html .= $content;
+        return $this;
+    }
+    
+    /**
+     * 添加密码框
+     * @param $name - name
+     * @param string $title - 标题
+     * @param array $validate - 字段验证
+     * @param string $help - 提示语句
+     * @param int $itemCol - 默认表单项宽度
+     * @throws Exception
+     * @return FormBuilder
+     */
+    public function addPassword($name, string $title = '', array $validate = [], string $help = '', int $itemCol = 12) {
+        if (is_array($name)) {
+            $itemCol = get_sub_value('width', $name, $itemCol);
+            $help = get_sub_value('help', $name, '');
+            $validate = get_sub_value('validate', $name, []);
+            $title = get_sub_value('title', $name, '');
+            $name = get_sub_value('name', $name, '');
+        }
+        $value = str_replace('"', '\'', $this->getFormData($name, ''));
+        $id = $this->formConfig['form_id'] . '_' . $name;
+        $assign = [
+            'name'        => $name,
+            'id'          => $id,
+            'value'       => $value,
+            'placeholder' => addslashes(strip_tags($help))
+        ];
+        $this->assign($assign);
+        $content = $this->fetch('password');
+        $this->curHtml = $this->addItem($id, $name, $content, $title, $validate, $help, $itemCol);
+        return $this;
+    }
+    
+    /**
+     * 添加时间范围选择框
+     * @param $name - name
+     * @param string $title - 标题
+     * @param array $validate - 字段验证
+     * @param string $placeholder - 提示语句
+     * @param string $help - 提示语句
+     * @param int $itemCol - 默认表单项宽度
+     * @throws Exception
+     * @return FormBuilder
+     */
+    public function addDateRange($name, string $title = '', array $validate = [], string $placeholder = '', string $help = '', int $itemCol = 12) {
+        if (is_array($name)) {
+            $itemCol = get_sub_value('width', $name, $itemCol);
+            $help = get_sub_value('help', $name, '');
+            $placeholder = get_sub_value('placeholder', $name, '');
+            $validate = get_sub_value('validate', $name, []);
+            $title = get_sub_value('title', $name, '');
+            $name = get_sub_value('name', $name, '');
+        }
+        $value = str_replace('"', '\'', $this->getFormData($name, ''));
+        $time = explode('~', $value);
+        $id = $this->formConfig['form_id'] . '_' . $name;
+        $assign = [
+            'name'        => $name,
+            'id'          => $id,
+            'value'       => $value,
+            'placeholder' => addslashes(strip_tags($placeholder)),
+            'sTime'       => get_sub_value(0, $time),
+            'eTime'       => get_sub_value(1, $time),
+        ];
+        $this->assign($assign);
+        $content = $this->fetch('date-range');
+        $this->curHtml = $this->addItem($id, $name, $content, $title, $validate, $help, $itemCol);
         return $this;
     }
     
@@ -391,29 +461,29 @@ class FormBuilder extends Builder
      * @param string $title
      * @param array $validate - 字段验证
      * @param bool $isMultiple - 是否多选
-     * @param bool $isInput - 是否支持手动输入
      * @param string $placeholder - 提示语句
      * @param string $help - 提示语句
      * @param int $itemCol - 默认表单项宽度
      * @throws Exception
      * @return FormBuilder
      */
-    public function addSelect($name, string $title = '', array $list = [], array $validate = [],string $placeholder = '',  string $help = '', bool $isMultiple = false, bool $isInput = false, int $itemCol = 12) {
+    public function addSelect($name, string $title = '', array $list = [], array $validate = [], string $placeholder = '', string $help = '', bool $isMultiple = false, int $itemCol = 12) {
         if (is_array($name)) {
             $itemCol = get_sub_value('width', $name, $itemCol);
             $placeholder = get_sub_value('placeholder', $name, '');
             $help = get_sub_value('help', $name, '');
-            $isInput = get_sub_value('is_input', $name, false);
             $isMultiple = get_sub_value('is_multiple', $name, false);
             $validate = get_sub_value('validate', $name, []);
             $list = get_sub_value('list', $name, []);
             $title = get_sub_value('title', $name, '');
             $name = get_sub_value('name', $name, '');
         }
-        $this->autoloadAssets('select2', 'all');
-        $value = str_replace('"', '\'', $this->getFormData($name, ''));
+        $this->autoloadAssets('select', 'all');
+        $value = $this->unSerialize($this->getFormData($name, ''));
         $list = $this->unSerialize($list);
         $id = $this->formConfig['form_id'] . '_' . $name;
+        $listValue = array_values($list);
+        $isGroup = isset($listValue[0]) && is_array($listValue[0]) ? true : false;
         $assign = [
             'name'        => $name,
             'id'          => $id,
@@ -421,7 +491,7 @@ class FormBuilder extends Builder
             'placeholder' => addslashes(strip_tags($placeholder)),
             'list'        => $list,
             'is_multiple' => ($isMultiple == true) ? true : false,
-            'tags'        => ($isInput == true) ? true : false
+            'is_group'    => $isGroup,
         ];
         $this->assign($assign);
         $content = $this->fetch('select');
