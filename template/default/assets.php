@@ -67,12 +67,20 @@ return [
     ],
     /* ------------------------------- 标签输入框插件 ------------------------------------------------- */
     'tags.js'             => [
-        //  标签输入框 插件
         '__builder_assets__/bootstrap-tagsinput-0.8.0/bootstrap-tagsinput.min.js',
         '__builder_assets__/bootstrap-tagsinput-0.8.0/script.min.js',
     ],
     'tags.css'            => [
-        // tags输入框插件
         '__builder_assets__/bootstrap-tagsinput-0.8.0/bootstrap-tagsinput.css',
+    ],
+    /* ------------------------------------ 文件上传 ------------------------------------------------- */
+    'file.css'            => [
+        '__builder_assets__/bootstrap-fileinput-4.5.1/css/fileinput.min.css',
+        '__builder_assets__/bootstrap-fileinput-4.5.1/themes/explorer-fa/theme.min.css',
+    ],
+    'file.js'             => [
+        '__builder_assets__/bootstrap-fileinput-4.5.1/js/fileinput.min.js',
+        '__builder_assets__/bootstrap-fileinput-4.5.1/js/locales/zh.js',
+        '__builder_assets__/bootstrap-fileinput-4.5.1/themes/explorer-fa/theme.min.js',
     ],
 ];

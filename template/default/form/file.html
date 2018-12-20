@@ -1,0 +1,133 @@
+<div class="file-loading">
+    <input id="input-gly" name="input-gly" type="file" value="https://res.wx.qq.com/mpres/en_US/htmledition/vue-weui/src/weui-desktopSkin/svg/buildless/bg_logo_primary4273fb.svg">
+</div>
+
+<!--
+<style>
+    .file-preview-box > .form-control {height: auto;margin-top: 2px;}
+
+</style>
+<div class="input-group" id="upload-<{$id}>">
+    <input type="text" class="form-control" value="<{$value}>" id="<{$id}>" name="<{$name}>" placeholder="<{$placeholder}>">
+    <span class="input-group-append">
+        <button type="button" class="custom-file btn btn-danger">&times;</button>
+        <button type="button" class="custom-file btn btn-primary" data-toggle="modal" data-target="#upload-modal-<{$id}>">选择</button>
+    </span>
+</div>
+<div class="input-group file-preview-box" id="upload-preview-<{$id}>">
+    <div class="form-control">
+        暂无预览
+    </div>
+</div>
+<div class="modal fade" id="upload-modal-<{$id}>">
+    <div class="modal-dialog modal-lg" style="min-width: 95%;">
+        <div class="modal-content">
+            
+          
+            <div class="modal-header">
+              <h4 class="modal-title">模态框头部</h4>
+                <ul class="nav nav-tabs" id="myTab" role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link active" id="home-tab" data-toggle="tab" href="#admin" role="tab" aria-controls="home"
+                           aria-selected="true">
+                            <h6>系统管理</h6>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="profile-tab" data-toggle="tab" href="#edit" role="tab" aria-controls="profile"
+                           aria-selected="false">
+                            <h6>新闻编辑</h6>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="contact-tab" data-toggle="tab" href="#audit" role="tab" aria-controls="contact"
+                           aria-selected="false">
+                            <h6>新闻审核</h6>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="contact-tab" data-toggle="tab" href="#contact" role="tab" aria-controls="contact"
+                           aria-selected="false">
+                            <h6>联系反馈</h6>
+                        </a>
+                    </li>
+                </ul>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            
+         
+            <div class="modal-body">
+               
+                <div class="tab-content border border-top-0" id="myTabContent" >
+                    <div class="tab-pane fade show active" id="admin" role="tabpanel" aria-labelledby="home-tab">
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item">系统管理内容</li>
+                        </ul>
+                    </div>
+                    <div class="tab-pane fade" id="edit" role="tabpanel" aria-labelledby="profile-tab">
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item">新闻编辑内容</li>
+                        </ul>
+                    </div>
+                    <div class="tab-pane fade" id="audit" role="tabpanel" aria-labelledby="contact-tab">
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item">新闻审核内容</li>
+                        </ul>
+                    </div>
+                    <div class="tab-pane fade" id="contact" role="tabpanel" aria-labelledby="contact-tab">
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item">问题反馈内容</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="view-container row">
+                    <div class="view-square get-file-one"
+                         style="background-image: url('https://we7.xqitw.cn/attachment/images/1/2018/12/aW6pLcKlLcRRC9Zph9Sk55lwZw9zsj.jpg')">
+                        <div class="view-mask">
+                            <span>✔</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+        
+            <div class="modal-footer">
+                <ul class="pagination view-pagination">
+                    <li class="page-item"><a class="page-link" href="#">«</a></li>
+                    <li class="page-item"><a class="page-link" href="#">1</a></li>
+                    <li class="page-item"><a class="page-link" href="#">2</a></li>
+                    <li class="page-item"><a class="page-link" href="#">3</a></li>
+                    <li class="page-item"><a class="page-link" href="#">»</a></li>
+                </ul>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
+            </div>
+        
+        </div>
+    </div>
+</div>
+-->
+<{:builder_event_listen($js_hook, function () use($img_ext,$id) {
+return <<<EXO
+<script type="text/javascript">
+    choiceOneFile('{$id}', '{$img_ext}');
+    
+    function choiceOneFile(id, allowedImgExt) {
+        var inputId = '#' + id;
+        var modalId = '#upload-modal-' + id;
+        var previewId = '#upload-preview-' + id + ' .form-control';
+        var suffixArr = allowedImgExt.split(",");
+        $(document).on('click', '.view-square', function (e) {
+            var fileUrl = $(this).css("backgroundImage").replace('url("', '').replace('")', '');
+            $(inputId).val(fileUrl);
+            var suffix = fileUrl.toLowerCase().split('.').splice(-1);
+            if ($.inArray(suffix[0], suffixArr) >= 0) {
+                $(previewId).html('<img src="' + fileUrl + '" alt="' + fileUrl + '" style="max-height:80px;max-width: 100%;">');
+            } else {
+                $(previewId).html('暂无预览');
+            }
+            $(modalId).modal('hide');
+        });
+    }
+</script>
+EXO;
+})}>

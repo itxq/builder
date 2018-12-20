@@ -29,11 +29,14 @@ class FormSubmit
     const PASSWORD = 'password';
     const HIDDEN = 'hidden';
     const JSON = 'json';
+    const COLOR = 'color';
+    const TAGS = 'tags';
     
     public static function submit(FormBuilder $builder, string $pk = 'id', array $allowData = []) {
+        //var_dump(Request::file('input-gly'));
         $formData = self::getFormData($builder, $pk, $allowData);
         self::success('提交成功', $formData);
-        //self::error('提交失败', []);
+        self::error('提交失败', Request::file('input-gly'));
         exit();
     }
     

@@ -145,6 +145,95 @@ class FormBuilder extends Builder
     }
     
     /**
+     * 添加字体图标选择器
+     * @param $name - name
+     * @param string $title - 标题
+     * @param array $list - 字体图标文件
+     * @param array $validate - 字段验证
+     * @param string $placeholder - 提示语句
+     * @param string $help - 提示语句
+     * @param int $itemCol - 默认表单项宽度
+     * @throws Exception
+     * @return FormBuilder
+     */
+    public function addIco($name, string $title = '', array $list = [], array $validate = [], string $placeholder = '', string $help = '', int $itemCol = 12) {
+        if (is_array($name)) {
+            $itemCol = get_sub_value('width', $name, $itemCol);
+            $placeholder = get_sub_value('placeholder', $name, '');
+            $help = get_sub_value('help', $name, '');
+            $validate = get_sub_value('validate', $name, []);
+            $title = get_sub_value('title', $name, '');
+            $list = $this->unSerialize(get_sub_value('list', $name, ''), false);
+            $name = get_sub_value('name', $name, '');
+        }
+        $value = str_replace('"', '\'', $this->getFormData($name, ''));
+        $id = $this->createId($name, $this->formConfig['form_id']);
+        $defaultIcoFile = [];
+        $icoFile = array_merge($defaultIcoFile, $list);
+        $ico = [];
+        foreach ($icoFile as $k => $v) {
+            //  $v = tpl_replace_string($v);
+            if (strpos($v, '//') === 0) {
+                $_url = request()->scheme() . ':' . $v;
+            } else if (strpos($v, '/') === 0) {
+                $_url = request()->domain() . $v;
+            } else {
+                $_url = $v;
+            }
+            $_pre = preg_match('/.*?\s([a-zA-Z0-9\-\_]+)$/', $k, $pre) ? $pre[1] : false;
+            if ($_pre == false) {
+                continue;
+            }
+            $_preg = "/\." . $_pre . "([a-zA-Z0-9\-\_]+)\:before/";
+            $_font = preg_match_all($_preg, @file_get_contents($_url), $icoList) ? $icoList[1] : [];
+            if (!is_array($_font) || count($_font) < 1) {
+                continue;
+            }
+            $ico[] = ['pre' => $k, 'ico' => $_font];
+            $this->addCss('<link rel="stylesheet" href="' . $_url . '">');
+        }
+        $assign = [
+            'name'        => $name,
+            'id'          => $id,
+            'value'       => $value,
+            'placeholder' => addslashes(strip_tags($placeholder)),
+            'ico'         => $ico,
+        ];
+        $this->assign($assign);
+        $content = $this->fetch('ico');
+        $this->curHtml = $this->addItem($id, $name, $content, $title, $validate, $help, $itemCol);
+        return $this;
+    }
+    
+    /**
+     * 添加单文件上传控件
+     * @param $name - name
+     * @param string $title - 标题
+     * @param string $placeholder - 提示语句
+     * @param array $validate - 字段验证
+     * @param string $help - 提示语句
+     * @param int $itemCol - 默认表单项宽度
+     * @throws Exception
+     * @return FormBuilder
+     */
+    public function addFile($name, string $title = '', array $validate = [], string $placeholder = '', string $help = '', int $itemCol = 12) {
+        $this->autoloadAssets('file', 'all');
+        $id = $this->createId($name, $this->formConfig['form_id']);
+        $imgExt = ['jpg', 'png', 'gif', 'bmp', 'jpeg', 'ico'];
+        $assign = [
+            'name'        => $name,
+            'id'          => $this->createId($name, $this->formConfig['form_id']),
+            'value'       => str_replace('"', '\'', $this->getFormData($name, '')),
+            'img_ext'     => implode(',', $imgExt),
+            'placeholder' => addslashes(strip_tags($placeholder))
+        ];
+        $this->assign($assign);
+        $content = $this->fetch('file');
+        $this->curHtml = $this->addItem($id, $name, $content, $title, $validate, $help, $itemCol);
+        return $this;
+    }
+    
+    /**
      * 添加hidden隐藏域
      * @param string $name - name
      * @throws Exception
@@ -300,10 +389,10 @@ class FormBuilder extends Builder
         $value = str_replace('"', '\'', $this->getFormData($name, ''));
         $id = $this->createId($name, $this->formConfig['form_id']);
         $assign = [
-            'name'  => $name,
-            'id'    => $id,
-            'value' => $value,
-            'title' => $title,
+            'name'        => $name,
+            'id'          => $id,
+            'value'       => $value,
+            'title'       => $title,
             'placeholder' => addslashes(strip_tags($placeholder))
         ];
         $this->assign($assign);

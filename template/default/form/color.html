@@ -1,11 +1,12 @@
 <div class="input-group" id="cpgroup-<{$id}>">
     <input type="text" class="form-control" value="<{$value}>" id="<{$id}>" name="<{$name}>" placeholder="<{$placeholder}>">
-    <span class="input-group-btn add-on">
+    <span class="input-group-append input-group-btn add-on">
           <button type="button" class="btn btn-primary">
               &nbsp;<i style="width:15px;height:15px;line-height:15px;vertical-align:baseline;display:inline-block;color:transparent;background:<{$value|default='#f1f1f1'}>;">■</i>&nbsp;
           </button>
     </span>
 </div>
+<input type="hidden" name="build_form_type[<{$name}>]" value="color">
 <{:builder_event_listen($js_hook, function () use($id,$format) {
 return <<<EXO
 <script type="text/javascript">
