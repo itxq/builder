@@ -403,8 +403,7 @@ abstract class Builder
      * @return mixed|string
      */
     protected function getTrueUrl(string $url) {
-        $tplReplaceString = array_merge((array)Config::get('template.tpl_replace_string'), get_sub_value('tpl_replace_string', $this->viewConfig, []));
-        $url = str_replace(array_keys($tplReplaceString), array_values($tplReplaceString), $url);
+        $url = $this->tplReplaceString($url);
         if (strpos($url, '//') === 0) {
             $trueUrl = Request::scheme() . ':' . $url;
         } else if (strpos($url, '/') === 0) {
@@ -485,5 +484,16 @@ abstract class Builder
             $str .= $strPol[mt_rand(0, $max)];
         }
         return $str;
+    }
+    
+    /**
+     * 模板字符串替换
+     * @param $string - 原始字符串
+     * @return string - 模板变量替换之后的字符串
+     */
+    protected function tplReplaceString(string $string) {
+        $tplReplaceString = array_merge((array)Config::get('template.tpl_replace_string'), get_sub_value('tpl_replace_string', $this->viewConfig, []));
+        $string = str_replace(array_keys($tplReplaceString), array_values($tplReplaceString), $string);
+        return $string;
     }
 }
