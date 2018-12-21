@@ -172,14 +172,7 @@ class FormBuilder extends Builder
         $icoFile = array_merge($defaultIcoFile, $list);
         $ico = [];
         foreach ($icoFile as $k => $v) {
-            //  $v = tpl_replace_string($v);
-            if (strpos($v, '//') === 0) {
-                $_url = request()->scheme() . ':' . $v;
-            } else if (strpos($v, '/') === 0) {
-                $_url = request()->domain() . $v;
-            } else {
-                $_url = $v;
-            }
+            $_url = $this->getTrueUrl($v);
             $_pre = preg_match('/.*?\s([a-zA-Z0-9\-\_]+)$/', $k, $pre) ? $pre[1] : false;
             if ($_pre == false) {
                 continue;
