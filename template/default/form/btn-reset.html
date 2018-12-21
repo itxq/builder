@@ -1,7 +1,7 @@
-<button id="<{$id}>" type="reset" class="btn btn-danger">
-    <{$btn_title|default='重置表单'|raw}>
+<button id="{{$id}}" type="reset" class="btn btn-danger">
+    {{$btn_title|default='重置表单'|raw}}
 </button>
-<{:builder_event_listen($js_hook, function () use($form_id,$id) {
+{{:builder_event_listen($js_hook, function () use($form_id,$id) {
 return <<<EXO
 <script type='text/javascript'>
     $(document).on('click', '#{$id}', function () {
@@ -9,4 +9,4 @@ return <<<EXO
     });
 </script>
 EXO;
-})}>
+})}}

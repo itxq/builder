@@ -1,29 +1,29 @@
-<input type="hidden" name="build_form_type[<{$name}>]" value="select">
+<input type="hidden" name="build_form_type[{{$name}}]" value="select">
 <select class="form-control select-item show-tick"
         style="display: none;"
         data-style="btn-default"
         data-live-search="true"
         data-actions-box="true"
-        name="<{$name}><{if $is_multiple == true}>[]<{/if}>"
-        id="<{$id}>"
-<{if $is_multiple == true}>multiple="multiple"<{/if}>>
-<{foreach $list as $k=>$v}>
-    <{if !$is_group}>
-        <{if in_array($k,$value)}>
-            <option value="<{$k}>" selected="selected"><{$v}></option>
-        <{else/}>
-            <option value="<{$k}>"><{$v}></option>
-        <{/if}>
-    <{else/}>
-        <optgroup label="<{$k}>">
-            <{foreach $v as $sk=>$sv}>
-                <{if in_array($sk,$value)}>
-                    <option value="<{$sk}>" selected="selected"><{$sv}></option>
-                <{else/}>
-                    <option value="<{$sk}>"><{$sv}></option>
-                <{/if}>
-            <{/foreach}>
+        name="{{$name}}{{if $is_multiple == true}}[]{{/if}}"
+        id="{{$id}}"
+{{if $is_multiple == true}}multiple="multiple"{{/if}}>
+{{foreach $list as $k=>$v}}
+    {{if !$is_group}}
+        {{if in_array($k,$value)}}
+            <option value="{{$k}}" selected="selected">{{$v}}</option>
+        {{else/}}
+            <option value="{{$k}}">{{$v}}</option>
+        {{/if}}
+    {{else/}}
+        <optgroup label="{{$k}}">
+            {{foreach $v as $sk=>$sv}}
+                {{if in_array($sk,$value)}}
+                    <option value="{{$sk}}" selected="selected">{{$sv}}</option>
+                {{else/}}
+                    <option value="{{$sk}}">{{$sv}}</option>
+                {{/if}}
+            {{/foreach}}
         </optgroup>
-    <{/if}>
-<{/foreach}>
+    {{/if}}
+{{/foreach}}
 </select>

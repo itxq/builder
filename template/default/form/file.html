@@ -7,19 +7,19 @@
     .file-preview-box > .form-control {height: auto;margin-top: 2px;}
 
 </style>
-<div class="input-group" id="upload-<{$id}>">
-    <input type="text" class="form-control" value="<{$value}>" id="<{$id}>" name="<{$name}>" placeholder="<{$placeholder}>">
+<div class="input-group" id="upload-{{$id}}">
+    <input type="text" class="form-control" value="{{$value}}" id="{{$id}}" name="{{$name}}" placeholder="{{$placeholder}}">
     <span class="input-group-append">
         <button type="button" class="custom-file btn btn-danger">&times;</button>
-        <button type="button" class="custom-file btn btn-primary" data-toggle="modal" data-target="#upload-modal-<{$id}>">选择</button>
+        <button type="button" class="custom-file btn btn-primary" data-toggle="modal" data-target="#upload-modal-{{$id}}">选择</button>
     </span>
 </div>
-<div class="input-group file-preview-box" id="upload-preview-<{$id}>">
+<div class="input-group file-preview-box" id="upload-preview-{{$id}}">
     <div class="form-control">
         暂无预览
     </div>
 </div>
-<div class="modal fade" id="upload-modal-<{$id}>">
+<div class="modal fade" id="upload-modal-{{$id}}">
     <div class="modal-dialog modal-lg" style="min-width: 95%;">
         <div class="modal-content">
             
@@ -106,7 +106,7 @@
     </div>
 </div>
 -->
-<{:builder_event_listen($js_hook, function () use($img_ext,$id) {
+{{:builder_event_listen($js_hook, function () use($img_ext,$id) {
 return <<<EXO
 <script type="text/javascript">
     choiceOneFile('{$id}', '{$img_ext}');
@@ -130,4 +130,4 @@ return <<<EXO
     }
 </script>
 EXO;
-})}>
+})}}

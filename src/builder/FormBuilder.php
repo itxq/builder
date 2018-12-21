@@ -743,6 +743,40 @@ class FormBuilder extends Builder
     }
     
     /**
+     * 添加坐标拾取器
+     * @param $name - name
+     * @param string $title - 标题
+     * @param array $validate - 字段验证
+     * @param string $help - 提示语句
+     * @param int $itemCol - 默认表单项宽度
+     * @throws Exception
+     * @return FormBuilder
+     */
+    public function addMap($name, string $title = '', array $validate = [], string $help = '', int $itemCol = 12) {
+        if (is_array($name)) {
+            $itemCol = get_sub_value('width', $name, $itemCol);
+            $help = get_sub_value('help', $name, '');
+            $validate = get_sub_value('validate', $name, []);
+            $title = get_sub_value('title', $name, '');
+            $name = get_sub_value('name', $name, '');
+        }
+        $this->autoloadAssets('map', 'js');
+        $value = $this->unSerialize($this->getFormData($name, []), false);
+        $id = $this->createId($name, $this->formConfig['form_id']);
+        $assign = [
+            'name'     => $name,
+            'id'       => $id,
+            'value'    => $value,
+            'location' => get_sub_value('location', $value, implode(',', $value)),
+            'address'  => get_sub_value('address', $value, ''),
+        ];
+        $this->assign($assign);
+        $content = $this->fetch('map');
+        $this->curHtml = $this->addItem($id, $name, $content, $title, $validate, $help, $itemCol);
+        return $this;
+    }
+    
+    /**
      * 添加 表单提交按钮
      * @param string $btnTitle - 按钮标题
      * @param string $btnType - 按钮类型(submit/button)

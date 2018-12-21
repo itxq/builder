@@ -1,10 +1,10 @@
 <div class="control-label text-left">
-    <{foreach $list as $k => $v}>
-    <label class="demo--label" for="<{$id}><{$name}>_<{$k}>">
-        <input class="demo--radio" type="radio" name="<{$name}>" id="<{$id}><{$name}>_<{$k}>" value="<{$k}>" placeholder="<{$k}>"
-        <{if $k == $value}>checked="checked"<{/if}>>
-        <span class="demo--radioInput"></span><span class="demo--radioInput-help"><{$v}></span>
+    {{foreach $list as $k => $v}}
+    <label class="demo--label" for="{{$id}}{{$name}}_{{$k}}">
+        <input class="demo--radio" type="radio" name="{{$name}}" id="{{$id}}{{$name}}_{{$k}}" value="{{$k}}" placeholder="{{$k}}"
+        {{if $k == $value}}checked="checked"{{/if}}>
+        <span class="demo--radioInput"></span><span class="demo--radioInput-help">{{$v}}</span>
     </label>
-    <{/foreach}>
+    {{/foreach}}
 </div>
-<input type="hidden" name="build_form_type[<{$name}>]" value="radio">
+<input type="hidden" name="build_form_type[{{$name}}]" value="radio">

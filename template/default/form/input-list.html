@@ -1,30 +1,30 @@
 <div class="input-group form-json-group">
     <div class="form-json-group-demo">
         <div class="input-group form-json-item">
-            <input type="text" name="<{$name}>[]" placeholder="<{$placeholder|default=''}>" class="form-control" disabled>
+            <input type="text" name="{{$name}}[]" placeholder="{{$placeholder|default=''}}" class="form-control" disabled>
             <span class="input-group-btn input-group-append">
                  <button class="btn btn-danger form-json-delete" type="button">&times;</button>
             </span>
         </div>
     </div>
     <div class="form-json-group-core">
-        <{if count($value) <1 }>
+        {{if count($value) <1 }}
         <div class="input-group form-json-item">
-            <input type="text" name="<{$name}>[]" placeholder="<{$placeholder|default=''}>" class="form-control">
+            <input type="text" name="{{$name}}[]" placeholder="{{$placeholder|default=''}}" class="form-control">
             <span class="input-group-btn input-group-append">
                  <button class="btn btn-danger form-json-delete" type="button">&times;</button>
             </span>
         </div>
-        <{else/}>
-        <{foreach $value as $k=>$v}>
+        {{else/}}
+        {{foreach $value as $k=>$v}}
         <div class="input-group form-json-item">
-            <input type="text" name="<{$name}>[]" placeholder="<{$placeholder|default=''}>" class="form-control" value="<{$v}>">
+            <input type="text" name="{{$name}}[]" placeholder="{{$placeholder|default=''}}" class="form-control" value="{{$v}}">
             <span class="input-group-btn input-group-append">
                  <button class="btn btn-danger form-json-delete" type="button">&times;</button>
             </span>
         </div>
-        <{/foreach}>
-        <{/if}>
+        {{/foreach}}
+        {{/if}}
     </div>
     <span class="form-json-group-add">
          <button class="btn btn-primary form-json-add" type="button">
@@ -32,4 +32,4 @@
          </button>
     </span>
 </div>
-<input type="hidden" name="build_form_type[<{$name}>]" value="texts">
+<input type="hidden" name="build_form_type[{{$name}}]" value="texts">

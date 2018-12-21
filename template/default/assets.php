@@ -83,4 +83,9 @@ return [
         '__builder_assets__/bootstrap-fileinput-4.5.1/js/locales/zh.js',
         '__builder_assets__/bootstrap-fileinput-4.5.1/themes/explorer-fa/theme.min.js',
     ],
+    /* ------------------------------------ 坐标拾取 ------------------------------------------------- */
+    'map.js'              => [
+        'https://map.qq.com/api/js?v=2.exp&key=__MAP_KEY__&libraries=place',
+        '__builder_assets__/qq-map-2.0/qq-map.min.js',
+    ],
 ];

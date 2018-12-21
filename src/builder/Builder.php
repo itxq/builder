@@ -142,6 +142,14 @@ abstract class Builder
             $this->autoloadAssets('bootstrap', 'all');
         }
         $this->viewConfig = $this->getViewConfig('template');
+        // 模板引擎普通标签开始标记
+        $this->viewConfig['tpl_begin'] = '{{';
+        // 模板引擎普通标签结束标记
+        $this->viewConfig['tpl_end'] = '}}';
+        // 标签库标签开始标记
+        $this->viewConfig['taglib_begin'] = '{{';
+        // 标签库标签结束标记
+        $this->viewConfig['taglib_end'] = '}}';
         $this->getAssets();
         $this->view = new View();
         $this->view->init($this->viewConfig);
@@ -231,11 +239,12 @@ abstract class Builder
     public function unSerialize($list, bool $isJsonType = false) {
         // 对普通字符串进行简析
         if (is_string($list)) {
+            $list = $this->tplReplaceString($list);
             if (preg_match('/^\{.*?\}$/', $list) || preg_match('/^\[.*?\]$/', $list)) {
                 $list = json_decode($list, true);
             } else if (preg_match('/^a:.*?(})$/', $list)) {
                 $list = unserialize($list);
-            } else if (preg_match('/^\<\{\:serialize.*?\}\>$/', $list) || preg_match('/^\<\{.*?\}\>$/', $list)) {
+            } else if (preg_match('/^{{\:serialize.*?}}$/', $list) || preg_match('/^{{.*?}}$/', $list)) {
                 $list = $this->unSerialize($this->display($list));
             } else if (empty($list)) {
                 $list = [];
@@ -316,11 +325,11 @@ abstract class Builder
      */
     protected function display(string $data) {
         $data = htmlspecialchars_decode($data);
-        if (preg_match('/^\<\{\:serialize.*?\}\>$/', $data)) {
+        if (preg_match('/^{{\:serialize.*?}}$/', $data)) {
             $data = unserialize($this->view->display($data));
-        } else if (preg_match('/^\<\{\:json_encode.*?\}\>$/', $data)) {
+        } else if (preg_match('/^{{\:json_encode.*?}}$/', $data)) {
             $data = json_decode($this->view->display($data), true);
-        } else if (preg_match('/^\<\{.*?\}\>$/', $data)) {
+        } else if (preg_match('/^{{.*?}}$/', $data)) {
             $data = $this->view->display($data);
         }
         return $data;
@@ -492,7 +501,7 @@ abstract class Builder
      * @return string - 模板变量替换之后的字符串
      */
     protected function tplReplaceString(string $string) {
-        $tplReplaceString = array_merge((array)Config::get('template.tpl_replace_string'), get_sub_value('tpl_replace_string', $this->viewConfig, []));
+        $tplReplaceString = array_merge(get_sub_value('tpl_replace_string', $this->viewConfig, []), (array)Config::get('template.tpl_replace_string'));
         $string = str_replace(array_keys($tplReplaceString), array_values($tplReplaceString), $string);
         return $string;
     }

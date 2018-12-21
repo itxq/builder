@@ -1,30 +1,30 @@
 <div class="input-group form-json-group">
     <div class="form-json-group-demo">
         <div class="form-json-item">
-            <pre style="display:block;width:100%;padding: 0;margin: 0;background: none;border: 0;"><textarea class="form-control" name="<{$name}>[]" rows="<{$rows}>" placeholder="<{$placeholder}>" disabled></textarea></pre>
+            <pre style="display:block;width:100%;padding: 0;margin: 0;background: none;border: 0;"><textarea class="form-control" name="{{$name}}[]" rows="{{$rows}}" placeholder="{{$placeholder}}" disabled></textarea></pre>
             <span class="input-group-btn-fixed">
                 <button class="btn btn-danger form-json-delete" type="button">&times;</button>
             </span>
         </div>
     </div>
     <div class="form-json-group-core">
-        <{if count($value) <1 }>
+        {{if count($value) <1 }}
         <div class="form-json-item">
-            <pre style="display:block;width:100%;padding: 0;margin: 0;background: none;border: 0;"><textarea class="form-control" name="<{$name}>[]" rows="<{$rows}>" placeholder="<{$placeholder}>"></textarea></pre>
+            <pre style="display:block;width:100%;padding: 0;margin: 0;background: none;border: 0;"><textarea class="form-control" name="{{$name}}[]" rows="{{$rows}}" placeholder="{{$placeholder}}"></textarea></pre>
             <span class="input-group-btn-fixed">
                 <button class="btn btn-danger form-json-delete" type="button">&times;</button>
             </span>
         </div>
-        <{else/}>
-        <{foreach $value as $k=>$v}>
+        {{else/}}
+        {{foreach $value as $k=>$v}}
         <div class="form-json-item">
-            <pre style="display:block;width:100%;padding: 0;margin: 0;background: none;border: 0;"><textarea class="form-control" name="<{$name}>[]" rows="<{$rows}>" placeholder="<{$placeholder}>"><{$v}></textarea></pre>
+            <pre style="display:block;width:100%;padding: 0;margin: 0;background: none;border: 0;"><textarea class="form-control" name="{{$name}}[]" rows="{{$rows}}" placeholder="{{$placeholder}}">{{$v}}</textarea></pre>
             <span class="input-group-btn-fixed">
                 <button class="btn btn-danger form-json-delete" type="button">&times;</button>
             </span>
         </div>
-        <{/foreach}>
-        <{/if}>
+        {{/foreach}}
+        {{/if}}
     </div>
     <span class="form-json-group-add">
          <button class="btn btn-primary form-json-add" type="button">
@@ -32,5 +32,5 @@
          </button>
     </span>
 </div>
-<input type="hidden" name="build_form_type[<{$name}>]" value="text_areas">
+<input type="hidden" name="build_form_type[{{$name}}]" value="text_areas">
 
