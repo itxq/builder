@@ -74,14 +74,9 @@ return [
         '__builder_assets__/bootstrap-tagsinput-0.8.0/bootstrap-tagsinput.css',
     ],
     /* ------------------------------------ 文件上传 ------------------------------------------------- */
-    'file.css'            => [
-        '__builder_assets__/bootstrap-fileinput-4.5.1/css/fileinput.min.css',
-        '__builder_assets__/bootstrap-fileinput-4.5.1/themes/explorer-fa/theme.min.css',
-    ],
+    'file.css'            => [],
     'file.js'             => [
-        '__builder_assets__/bootstrap-fileinput-4.5.1/js/fileinput.min.js',
-        '__builder_assets__/bootstrap-fileinput-4.5.1/js/locales/zh.js',
-        '__builder_assets__/bootstrap-fileinput-4.5.1/themes/explorer-fa/theme.min.js',
+        '/ckeditor/ckfinder-3.4.5/ckfinder.js',
     ],
     /* ------------------------------------ 坐标拾取 ------------------------------------------------- */
     'map.js'              => [
