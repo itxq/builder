@@ -28,16 +28,16 @@ if (!function_exists('create_form')) {
     
     /**
      * 创建表单
-     * @param array|null $data - 表单默认数据
-     * @param int $colWidth - 表单label宽度
+     * @param array $data - 表单默认数据
+     * @param int $width - 表单label宽度
      * @param string $template - 使用模板名
      * @param array $config - 更多配置项
      * @return \itxq\builder\FormBuilder
      * @throws \think\Exception
      */
-    function create_form($data = null, int $colWidth = 0, string $template = 'default', array $config = []) {
+    function create_form(array $data = [], int $width = 0, string $template = 'default', array $config = []) {
         $config['data'] = $data;
-        $config['width'] = $colWidth;
+        $config['width'] = $width;
         $config['template_name'] = $template;
         $formBuilder = new \itxq\builder\FormBuilder($config);
         return $formBuilder;
