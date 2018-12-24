@@ -4,7 +4,8 @@
             <i class="{{if empty($value)}}fa fa-camera-retro{{else/}}{{$value}}{{/if}}"></i>
         </span>
     </span>
-    <input class="form-control" type="text" name="{{$name}}" id="{{$id}}" placeholder="{{$placeholder}}" value="{{$value}}">
+    <input class="form-control {{$class}}" type="text" name="{{$name}}" id="{{$id}}" placeholder="{{$placeholder}}" value="{{$value}}"
+    {{$disabled ? 'disabled=" disabled"':''}} {{$readonly ? 'readonly="readonly"':''}}>
     <span class="input-group-btn input-group-append">
         <button type="button" data-toggle="modal" href="#{{$id}}modalDialog" role="button" class="btn btn-primary input-group-append">
             选择
@@ -24,20 +25,20 @@
                 </div>
                 <div class="tab-base" role="tablist">
                     <ul class="nav nav-tabs">
-                        {{foreach $ico as $k=>$v}}
+                        {{foreach $list as $k=>$v}}
                         <li class="nav-item {{if $k==0}}active{{/if}}">
                             <a href="#ico-tab-table1-{{$k}}" data-toggle="tab" class="nav-link {{if $k==0}}active{{/if}}">{{$v.pre}}</a>
                         </li>
                         {{/foreach}}
                     </ul>
                     <div class="tab-content text-left" style="margin: 0;padding: 0;">
-                        {{foreach $ico as $k=>$v}}
+                        {{foreach $list as $k=>$v}}
                         <div class="tab-pane {{if $k==0}}active in{{/if}}" id="ico-tab-table1-{{$k}}" style="margin-top: 15px;">
                             {{foreach $v['ico'] as $sk=>$sv}}
                             <button data-ico="{{$v.pre}}{{$sv}}"
-                                  class="ico-item btn btn-primary" data-dismiss="modal" aria-hidden="true" type="button"
-                                  style="display: inline-block;padding: 10px;margin:0 2px 4px 2px ; border: solid 1px #CCC;width: 45px;height: 45px;text-align: center;vertical-align: middle; cursor: pointer;">
-                            <i class="{{$v.pre}}{{$sv}}"></i>
+                                    class="ico-item btn btn-primary" data-dismiss="modal" aria-hidden="true" type="button"
+                                    style="display: inline-block;padding: 10px;margin:0 2px 4px 2px ; border: solid 1px #CCC;width: 45px;height: 45px;text-align: center;vertical-align: middle; cursor: pointer;">
+                                <i class="{{$v.pre}}{{$sv}}"></i>
                             </button>
                             {{/foreach}}
                         </div>
@@ -48,7 +49,6 @@
         </div>
     </div>
 </div>
-<input type="hidden" name="build_form_type[{{$name}}]" value="ico">
 {{:builder_event_listen($js_hook, function () use($id) {
 return <<<EXO
 <script type="text/javascript">

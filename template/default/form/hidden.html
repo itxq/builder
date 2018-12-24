@@ -1,2 +1,3 @@
-<input type="hidden" id="{{$id}}" name="{{$name}}" value="{{$value}}">
-<input type="hidden" name="build_form_type[{{$name}}]" value="hidden">
+<input class="{{$class}}" type="hidden" id="{{$id}}" name="{{$name}}" value="{{$value}}"
+       {{$disabled ? 'disabled="disabled"':''}} {{$readonly ? 'readonly="readonly"':''}}
+>

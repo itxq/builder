@@ -1,14 +1,15 @@
-<input type="hidden" name="build_form_type[{{$name}}]" value="select">
-<select class="form-control select-item show-tick"
-        style="display: none;"
+<select class="form-control select-item show-tick {{$class}}"
+        style="display: none"
         data-style="btn-default"
         data-live-search="true"
         data-actions-box="true"
-        name="{{$name}}{{if $is_multiple == true}}[]{{/if}}"
+        name="{{$name}}{{$multiple ? '[]':''}}"
         id="{{$id}}"
-{{if $is_multiple == true}}multiple="multiple"{{/if}}>
+{{$multiple ? 'multiple="multiple"':''}}
+{{$disabled ? 'disabled="disabled"':''}}
+{{$readonly && !$multiple ? 'onfocus="this.defaultIndex=this.value;" onchange="this.selectedIndex=this.defaultIndex;"':''}}>
 {{foreach $list as $k=>$v}}
-    {{if !$is_group}}
+    {{if !$group}}
         {{if in_array($k,$value)}}
             <option value="{{$k}}" selected="selected">{{$v}}</option>
         {{else/}}

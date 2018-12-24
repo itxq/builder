@@ -2,10 +2,9 @@
     <input type="hidden" name="{{$name}}" value="">
     {{foreach $list as $k=>$v}}
     <label class="demo--label" for="{{$id}}{{$name}}_{{$k}}">
-        <input class="demo--radio" id="{{$id}}{{$name}}_{{$k}}" type="checkbox" name="{{$name}}[]" value="{{$k}}" placeholder="{{$k}}"
-        {{if in_array($k, $value)}} checked="checked" {{/if}}>
+        <input class="demo--radio  {{$class}}" id="{{$id}}{{$name}}_{{$k}}" type="checkbox" name="{{$name}}[]" value="{{$k}}" placeholder="{{$k}}"
+               {{if in_array($k, $value)}} checked="checked" {{/if}} {{$disabled ? 'disabled="disabled"':''}} {{$readonly ? 'onclick="return false;"':''}}>
         <span class="demo--checkbox demo--radioInput"></span>{{$v}}
     </label>
     {{/foreach}}
 </div>
-<input type="hidden" name="build_form_type[{{$name}}]" value="checkbox">

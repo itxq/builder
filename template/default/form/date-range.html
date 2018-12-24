@@ -1,5 +1,6 @@
-<input type="text" class="form-control daterangepicker-input" id="{{$id}}" name="{{$name}}" placeholder="{{$placeholder}}" value="{{$value}}">
-<input type="hidden" name="build_form_type[{{$name}}]" value="date_range">
+<input type="text" class="form-control daterangepicker-input {{$class}}" id="{{$id}}" name="{{$name}}" placeholder="{{$placeholder}}" value="{{$value}}"
+       {{$disabled ? 'disabled="disabled"':''}} {{$readonly ? 'readonly="readonly"':''}}
+>
 {{:builder_event_listen($js_hook, function () use($form_id,$id,$value,$sTime,$eTime) {
 return <<<EXO
 <script type="text/javascript">

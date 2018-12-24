@@ -2,17 +2,17 @@
     <span class="input-group-btn input-group-prepend">
 		 <span class="btn btn-info">坐标</span>
     </span>
-    <input type="text" class="form-control" id="ma-location-{{$id}}" placeholder="格式：经度,纬度" name="{{$name}}[location]" value="{{$location}}">
+    <input type="text" class="form-control  {{$class}}" id="ma-location-{{$id}}" placeholder="格式：经度,纬度" name="{{$name}}[location]" value="{{$location}}"
+           {{$disabled ? 'disabled="disabled"':''}} {{$readonly ? 'readonly="readonly"':''}}>
     <span class="input-group-btn input-group-prepend input-group-append">
 		 <span class="btn btn-info">地址</span>
     </span>
-    <input type="text" class="form-control" id="map-address-{{$id}}" placeholder="地址，输入地址可检索坐标" name="{{$name}}[address]" value="{{$address}}">
+    <input type="text" class="form-control {{$class}}" id="map-address-{{$id}}" placeholder="地址，输入地址可检索坐标" name="{{$name}}[address]" value="{{$address}}">
     <span class="input-group-btn input-group-append">
         <button class="btn btn-danger" type="button" id="map-toggle-btn-{{$id}}">地图</button>
     </span>
 </div>
 <div id="map-container-{{$id}}" style="display: none;"></div>
-<input type="hidden" name="build_form_type[{{$name}}]" value="map">
 {{:builder_event_listen($js_hook, function () use($id) {
 return <<<EXO
 <script type="text/javascript">

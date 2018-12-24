@@ -1,13 +1,14 @@
-<div class="col-md-{{$item_col}}">
+<div class="col-md-{{$width}}">
     <div class="form-group">
         <div class="row">
-            <label for="{{$id}}" class="col-md-{{$width==0?'12':$width}} control-label">
+            <label for="{{$id}}" class="col-md-{{$label_width}} control-label">
                 {{$title}}
             </label>
-            <div class="col-md-{{$col_width==0?'12':$col_width}}">
+            <div class="col-md-{{$item_width}}">
                 {{$content|raw}}
-                <span class="help-{{$help_type|default=''}} text-info">{{$help}}</span>
+                <span class="help-block text-info">{{$help}}</span>
             </div>
         </div>
     </div>
 </div>
+<input type="hidden" name="build_form_type[{{$name}}]" value="{{$type}}">

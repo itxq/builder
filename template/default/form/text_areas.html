@@ -2,35 +2,42 @@
     <div class="form-json-group-demo">
         <div class="form-json-item">
             <pre style="display:block;width:100%;padding: 0;margin: 0;background: none;border: 0;"><textarea class="form-control" name="{{$name}}[]" rows="{{$rows}}" placeholder="{{$placeholder}}" disabled></textarea></pre>
+            {{if !$disabled && !$readonly}}
             <span class="input-group-btn-fixed">
                 <button class="btn btn-danger form-json-delete" type="button">&times;</button>
             </span>
+            {{/if}}
         </div>
     </div>
     <div class="form-json-group-core">
         {{if count($value) <1 }}
         <div class="form-json-item">
-            <pre style="display:block;width:100%;padding: 0;margin: 0;background: none;border: 0;"><textarea class="form-control" name="{{$name}}[]" rows="{{$rows}}" placeholder="{{$placeholder}}"></textarea></pre>
+            <pre style="display:block;width:100%;padding: 0;margin: 0;background: none;border: 0;"><textarea class="form-control" name="{{$name}}[]" rows="{{$rows}}" placeholder="{{$placeholder}}" {{$disabled ? 'disabled="disabled"':''}} {{$readonly ? 'readonly="readonly"':''}}></textarea></pre>
+            {{if !$disabled && !$readonly}}
             <span class="input-group-btn-fixed">
                 <button class="btn btn-danger form-json-delete" type="button">&times;</button>
             </span>
+            {{/if}}
         </div>
         {{else/}}
         {{foreach $value as $k=>$v}}
         <div class="form-json-item">
-            <pre style="display:block;width:100%;padding: 0;margin: 0;background: none;border: 0;"><textarea class="form-control" name="{{$name}}[]" rows="{{$rows}}" placeholder="{{$placeholder}}">{{$v}}</textarea></pre>
+            <pre style="display:block;width:100%;padding: 0;margin: 0;background: none;border: 0;"><textarea class="form-control" name="{{$name}}[]" rows="{{$rows}}" placeholder="{{$placeholder}}" {{$disabled ? 'disabled="disabled"':''}} {{$readonly ? 'readonly="readonly"':''}}>{{$v}}</textarea></pre>
+            {{if !$disabled && !$readonly}}
             <span class="input-group-btn-fixed">
                 <button class="btn btn-danger form-json-delete" type="button">&times;</button>
             </span>
+            {{/if}}
         </div>
         {{/foreach}}
         {{/if}}
     </div>
+    {{if !$disabled && !$readonly}}
     <span class="form-json-group-add">
          <button class="btn btn-primary form-json-add" type="button">
              追加
          </button>
     </span>
+    {{/if}}
 </div>
-<input type="hidden" name="build_form_type[{{$name}}]" value="text_areas">
 

@@ -1,2 +1,4 @@
-<input class="form-control bootstrap-tagsinput-role" type="text" id="{{$id}}" name="{{$name}}" value="{{$value}}" placeholder="{{$placeholder}}">
-<input type="hidden" name="build_form_type[{{$name}}]" value="tags">
+<input class="form-control {{$readonly ? '':'bootstrap-tagsinput-role'}}  {{$class}}"
+       type="text" id="{{$id}}" name="{{$name}}" value="{{$value}}" placeholder="{{$placeholder}}"
+       {{$disabled ? 'disabled="disabled"':''}} {{$readonly ? 'readonly="readonly"':''}}
+>

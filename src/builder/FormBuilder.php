@@ -23,6 +23,39 @@ use think\facade\Request;
  */
 class FormBuilder extends Builder
 {
+    const id = 'id';
+    const value = 'value';
+    const name = 'name';
+    const title = 'title';
+    const lists = 'list';
+    const placeholder = 'placeholder';
+    const tip = 'tip';
+    const width = 'width';
+    const class_list = 'class';
+    const validate = 'validate';
+    const type = 'type';
+    const disabled = 'disabled';
+    const readonly = 'readonly';
+    const multiple = 'multiple';
+    // ----------------------------------------------------------------
+    const form_map = 'map';
+    const form_text = 'text';
+    const form_file = 'file';
+    const form_texts = 'texts';
+    const form_password = 'password';
+    const form_color = 'color';
+    const form_tags = 'tags';
+    const form_ico = 'ico';
+    const form_radio = 'radio';
+    const form_checkbox = 'checkbox';
+    const form_select = 'select';
+    const form_switch = 'switch';
+    const form_hidden = 'hidden';
+    const form_hr = 'hr';
+    const form_date_range = 'date_range';
+    const form_json = 'json';
+    const form_text_area = 'text_area';
+    const form_text_areas = 'text_areas';
     /**
      * @var string - 多项表单数据
      */
@@ -72,7 +105,10 @@ class FormBuilder extends Builder
         $config['type'] = 'form';
         parent::__construct($config);
         $this->formData = get_sub_value('data', $config, []);
-        $this->formConfig['col_width'] = get_sub_value('width', $config, 2);
+        $this->formConfig['width'] = intval(get_sub_value('width', $config, 2));
+        if ($this->formConfig['width'] > 12 || $this->formConfig['width'] <= 0) {
+            $this->formConfig['width'] = 12;
+        }
         $this->autoloadAssets('form', 'all');
     }
     
@@ -119,10 +155,29 @@ class FormBuilder extends Builder
     }
     
     /**
-     * 添加HR分割线
+     * 添加单行文本框
+     * @param string|array $name - 表单元素name属性名
+     * @param string $title - 标题
+     * @param array $config - 更多配置
+     * @throws Exception
      * @return FormBuilder
      */
-    public function addHr() {
+    public function addText($name, string $title = '', array $config = []) {
+        $config = $this->iniFormItemConfig($name, $title, $config);
+        $config[self::value] = addslashes($this->getFormData($config[self::name], $config[self::value]));
+        $config[self::type] = self::form_text;
+        $this->assign($config);
+        $content = $this->fetch('text');
+        $this->curHtml = $this->addItem($content, $config);
+        return $this;
+    }
+    
+    /**
+     * 添加HR分割线
+     * @param string|array $name - 表单元素name属性名
+     * @return FormBuilder
+     */
+    public function addHr($name = '') {
         $this->curHtml = '<hr style="height: 0;width: 100%;margin: 0;padding: 0;color: transparent;border: 0;">';
         $this->html .= $this->curHtml;
         return $this;
@@ -132,45 +187,32 @@ class FormBuilder extends Builder
      * 添加表单验证令牌
      * @param string|array $name - 令牌名称
      * @param mixed $tokenType - 令牌生成方法
+     * @param array $config - 更多配置
      * @return FormBuilder
      */
-    public function addToken($name = '__token__', $tokenType = 'md5') {
-        if (is_array($name)) {
-            $tokenType = get_sub_value('token_type', $name, 'md5');
-            $name = get_sub_value('name', $name, '__token__');
-        }
-        $this->curHtml = Request::token($name, $tokenType);
+    public function addToken($name = '__token__', $tokenType = 'md5', array $config = []) {
+        $config = $this->iniFormItemConfig($name, $tokenType, $config);
+        $this->curHtml = Request::token($config[self::name], $config[self::title]);
         $this->html .= $this->curHtml;
         return $this;
     }
     
     /**
      * 添加字体图标选择器
-     * @param $name - name
+     * @param string|array $name - 表单元素name属性名
      * @param string $title - 标题
-     * @param array $list - 字体图标文件
-     * @param array $validate - 字段验证
-     * @param string $placeholder - 提示语句
-     * @param string $help - 提示语句
-     * @param int $itemCol - 默认表单项宽度
+     * @param array $config - 更多配置
      * @throws Exception
      * @return FormBuilder
      */
-    public function addIco($name, string $title = '', array $list = [], array $validate = [], string $placeholder = '', string $help = '', int $itemCol = 12) {
-        if (is_array($name)) {
-            $itemCol = get_sub_value('width', $name, $itemCol);
-            $placeholder = get_sub_value('placeholder', $name, '');
-            $help = get_sub_value('help', $name, '');
-            $validate = get_sub_value('validate', $name, []);
-            $title = get_sub_value('title', $name, '');
-            $list = $this->unSerialize(get_sub_value('list', $name, ''), false);
-            $name = get_sub_value('name', $name, '');
-        }
-        $value = str_replace('"', '\'', $this->getFormData($name, ''));
-        $id = $this->createId($name, $this->formConfig['form_id']);
+    public function addIco($name, string $title = '', array $config = []) {
+        $config = $this->iniFormItemConfig($name, $title, $config);
+        $config[self::lists] = $this->unSerialize($config[self::lists], false);
+        $config[self::value] = addslashes($this->getFormData($config[self::name], $config[self::value]));
+        $config[self::type] = self::form_ico;
         $defaultIcoFile = [];
-        $icoFile = array_merge($defaultIcoFile, $list);
-        $ico = [];
+        $icoFile = array_merge($defaultIcoFile, $config[self::lists]);
+        $list = [];
         foreach ($icoFile as $k => $v) {
             $_url = $this->getTrueUrl($v);
             $_pre = preg_match('/.*?\s([a-zA-Z0-9\-\_]+)$/', $k, $pre) ? $pre[1] : false;
@@ -182,67 +224,50 @@ class FormBuilder extends Builder
             if (!is_array($_font) || count($_font) < 1) {
                 continue;
             }
-            $ico[] = ['pre' => $k, 'ico' => $_font];
+            $list[] = ['pre' => $k, 'ico' => $_font];
             $this->addCss('<link rel="stylesheet" href="' . $_url . '">');
         }
-        $assign = [
-            'name'        => $name,
-            'id'          => $id,
-            'value'       => $value,
-            'placeholder' => addslashes(strip_tags($placeholder)),
-            'ico'         => $ico,
-        ];
-        $this->assign($assign);
+        $config[self::lists] = $list;
+        $this->assign($config);
         $content = $this->fetch('ico');
-        $this->curHtml = $this->addItem($id, $name, $content, $title, $validate, $help, $itemCol);
+        $this->curHtml = $this->addItem($content, $config);
         return $this;
     }
     
     /**
      * 添加单文件上传控件
-     * @param $name - name
+     * @param string|array $name - 表单元素name属性名
      * @param string $title - 标题
-     * @param string $placeholder - 提示语句
-     * @param array $validate - 字段验证
-     * @param string $help - 提示语句
-     * @param int $itemCol - 默认表单项宽度
+     * @param array $config - 更多配置
      * @throws Exception
      * @return FormBuilder
      */
-    public function addFile($name, string $title = '', array $validate = [], string $placeholder = '', string $help = '', int $itemCol = 12) {
+    public function addFile($name, string $title = '', array $config = []) {
         $this->autoloadAssets('file', 'all');
-        $id = $this->createId($name, $this->formConfig['form_id']);
-        $imgExt = ['jpg', 'png', 'gif', 'bmp', 'jpeg', 'ico'];
-        $assign = [
-            'name'        => $name,
-            'id'          => $this->createId($name, $this->formConfig['form_id']),
-            'value'       => str_replace('"', '\'', $this->getFormData($name, '')),
-            'img_ext'     => implode(',', $imgExt),
-            'placeholder' => addslashes(strip_tags($placeholder))
-        ];
-        $this->assign($assign);
+        $config = $this->iniFormItemConfig($name, $title, $config);
+        $config[self::value] = addslashes($this->getFormData($config[self::name], $config[self::value]));
+        $config[self::type] = self::form_file;
+        $config['url'] = $this->getTrueUrl(get_sub_value('url', $config, ''));
+        $config['img_ext'] = ['jpg', 'png', 'gif', 'bmp', 'jpeg', 'ico'];
+        $this->assign($config);
         $content = $this->fetch('file');
-        $this->curHtml = $this->addItem($id, $name, $content, $title, $validate, $help, $itemCol);
+        $this->curHtml = $this->addItem($content, $config);
         return $this;
     }
     
     /**
      * 添加hidden隐藏域
-     * @param string $name - name
+     * @param string|array $name - 表单元素name属性名
+     * @param string $title - 标题
+     * @param array $config - 更多配置
      * @throws Exception
      * @return FormBuilder
      */
-    public function addHidden($name) {
-        if (is_array($name)) {
-            $name = get_sub_value('name', $name, '');
-        }
-        $assign = [
-            'name'  => $name,
-            'id'    => $this->createId($name, $this->formConfig['form_id']),
-            'value' => str_replace('"', '\'', $this->getFormData($name, ''))
-        ];
-        $this->assign($assign);
-        $content = $this->fetch('hidden');
+    public function addHidden($name, string $title = '', array $config = []) {
+        $config = $this->iniFormItemConfig($name, $title, $config);
+        $config[self::value] = addslashes($this->getFormData($config[self::name], $config[self::value]));
+        $this->assign($config);
+        $content = $this->fetch('hidden') . '<input type="hidden" name="build_form_type[' . $config[self::name] . ']" value="' . self::form_hidden . '">';
         $this->curHtml = $content;
         $this->html .= $content;
         return $this;
@@ -250,522 +275,271 @@ class FormBuilder extends Builder
     
     /**
      * 添加密码框
-     * @param $name - name
+     * @param string|array $name - 表单元素name属性名
      * @param string $title - 标题
-     * @param string $placeholder - 提示语句
-     * @param array $validate - 字段验证
-     * @param string $help - 提示语句
-     * @param int $itemCol - 默认表单项宽度
+     * @param array $config - 更多配置
      * @throws Exception
      * @return FormBuilder
      */
-    public function addPassword($name, string $title = '', array $validate = [], string $placeholder = '', string $help = '', int $itemCol = 12) {
-        if (is_array($name)) {
-            $itemCol = get_sub_value('width', $name, $itemCol);
-            $placeholder = get_sub_value('placeholder', $name, '');
-            $help = get_sub_value('help', $name, '');
-            $validate = get_sub_value('validate', $name, []);
-            $title = get_sub_value('title', $name, '');
-            $name = get_sub_value('name', $name, '');
-        }
-        $value = str_replace('"', '\'', $this->getFormData($name, ''));
-        $id = $this->createId($name, $this->formConfig['form_id']);
-        $assign = [
-            'name'        => $name,
-            'id'          => $id,
-            'value'       => $value,
-            'placeholder' => addslashes(strip_tags($placeholder))
-        ];
-        $this->assign($assign);
+    public function addPassword($name, string $title = '', array $config = []) {
+        $config = $this->iniFormItemConfig($name, $title, $config);
+        $config[self::value] = addslashes($this->getFormData($config[self::name], $config[self::value]));
+        $config[self::type] = self::form_password;
+        $this->assign($config);
         $content = $this->fetch('password');
-        $this->curHtml = $this->addItem($id, $name, $content, $title, $validate, $help, $itemCol);
+        $this->curHtml = $this->addItem($content, $config);
         return $this;
     }
     
     /**
      * 添加时间范围选择框
-     * @param $name - name
+     * @param string|array $name - 表单元素name属性名
      * @param string $title - 标题
-     * @param array $validate - 字段验证
-     * @param string $placeholder - 提示语句
-     * @param string $help - 提示语句
-     * @param int $itemCol - 默认表单项宽度
+     * @param array $config - 更多配置
      * @throws Exception
      * @return FormBuilder
      */
-    public function addDateRange($name, string $title = '', array $validate = [], string $placeholder = '', string $help = '', int $itemCol = 12) {
-        if (is_array($name)) {
-            $itemCol = get_sub_value('width', $name, $itemCol);
-            $help = get_sub_value('help', $name, '');
-            $placeholder = get_sub_value('placeholder', $name, '');
-            $validate = get_sub_value('validate', $name, []);
-            $title = get_sub_value('title', $name, '');
-            $name = get_sub_value('name', $name, '');
-        }
+    public function addDateRange($name, string $title = '', array $config = []) {
+        $config = $this->iniFormItemConfig($name, $title, $config);
+        $config[self::value] = addslashes($this->getFormData($config[self::name], $config[self::value]));
+        $config[self::type] = self::form_date_range;
         $this->autoloadAssets('daterangepicker', 'all');
-        $value = str_replace('"', '\'', $this->getFormData($name, ''));
-        $time = explode('~', $value);
-        $id = $this->createId($name, $this->formConfig['form_id']);
-        $assign = [
-            'name'        => $name,
-            'id'          => $id,
-            'value'       => $value,
-            'placeholder' => addslashes(strip_tags($placeholder)),
-            'sTime'       => get_sub_value(0, $time),
-            'eTime'       => get_sub_value(1, $time),
-        ];
-        $this->assign($assign);
+        $time = explode('~', $config[self::value]);
+        $config['sTime'] = get_sub_value(0, $time);
+        $config['eTime'] = get_sub_value(1, $time);
+        $this->assign($config);
         $content = $this->fetch('date-range');
-        $this->curHtml = $this->addItem($id, $name, $content, $title, $validate, $help, $itemCol);
+        $this->curHtml = $this->addItem($content, $config);
         return $this;
     }
     
     /**
      * 添加JSON表单项
-     * @param $name - name
+     * @param string|array $name - 表单元素name属性名
      * @param string $title - 标题
-     * @param array $validate - 字段验证
-     * @param string $help - 提示语句
-     * @param int $itemCol - 默认表单项宽度
-     * @param string $keyName - 页面显示json键名称
-     * @param string $valueName - 页面显示json值名称
+     * @param array $config - 更多配置
      * @return FormBuilder
      * @throws Exception
      */
-    public function addJson($name, string $title = '', array $validate = [], string $help = '', string $keyName = '键', string $valueName = '值', int $itemCol = 12) {
-        if (is_array($name)) {
-            $itemCol = get_sub_value('width', $name, $itemCol);
-            $help = get_sub_value('help', $name, $help);
-            $validate = get_sub_value('validate', $name, $validate);
-            $title = get_sub_value('title', $name, $title);
-            $keyName = get_sub_value('key_name', $name, $keyName);
-            $valueName = get_sub_value('value_name', $name, $valueName);
-            $name = get_sub_value('name', $name, '');
-        }
-        $value = $this->unSerialize($this->getFormData($name, []), false);
-        $id = $this->createId($name, $this->formConfig['form_id']);
-        $assign = [
-            'name'      => $name,
-            'id'        => $id,
-            'value'     => $value,
-            'title'     => $title,
-            'keyName'   => $keyName,
-            'valueName' => $valueName,
-        ];
-        $this->assign($assign);
+    public function addJson($name, string $title = '', array $config = []) {
+        $config = $this->iniFormItemConfig($name, $title, $config);
+        $config[self::value] = $this->unSerialize($this->getFormData($config[self::name], $config[self::value]), false);
+        $config[self::type] = self::form_json;
+        $config['keyName'] = get_sub_value('key_name', $config, '键');
+        $config['valueName'] = get_sub_value('value_name', $config, '值');
+        $this->assign($config);
         $content = $this->fetch('json');
-        $this->curHtml = $this->addItem($id, $name, $content, $title, $validate, $help, $itemCol);
+        $this->curHtml = $this->addItem($content, $config);
         return $this;
     }
     
     /**
      * 添加标签输入框
-     * @param $name - name
+     * @param string|array $name - 表单元素name属性名
      * @param string $title - 标题
-     * @param array $validate - 字段验证
-     * @param string $placeholder - 提示语句
-     * @param string $help - 提示语句
-     * @param int $itemCol - 默认表单项宽度
+     * @param array $config - 更多配置
      * @throws Exception
      * @return FormBuilder
      */
-    public function addTags($name, string $title = '', array $validate = [], string $placeholder = '', string $help = '', int $itemCol = 12) {
-        if (is_array($name)) {
-            $itemCol = get_sub_value('width', $name, $itemCol);
-            $placeholder = get_sub_value('placeholder', $name, '');
-            $help = get_sub_value('help', $name, '');
-            $validate = get_sub_value('validate', $name, []);
-            $title = get_sub_value('title', $name, '');
-            $name = get_sub_value('name', $name, '');
-        }
+    public function addTags($name, string $title = '', array $config = []) {
         $this->autoloadAssets('tags', 'all');
-        $value = str_replace('"', '\'', $this->getFormData($name, ''));
-        $id = $this->createId($name, $this->formConfig['form_id']);
-        $assign = [
-            'name'        => $name,
-            'id'          => $id,
-            'value'       => $value,
-            'title'       => $title,
-            'placeholder' => addslashes(strip_tags($placeholder))
-        ];
-        $this->assign($assign);
+        $config = $this->iniFormItemConfig($name, $title, $config);
+        $config[self::value] = addslashes($this->getFormData($config[self::name], $config[self::value]));
+        $config[self::type] = self::form_tags;
+        $this->assign($config);
         $content = $this->fetch('tags');
-        $this->curHtml = $this->addItem($id, $name, $content, $title, $validate, $help, $itemCol);
+        $this->curHtml = $this->addItem($content, $config);
         return $this;
     }
     
     /**
      * 添加颜色选择器
-     * @param $name - name
+     * @param string|array $name - 表单元素name属性名
      * @param string $title - 标题
-     * @param string $type - 颜色类型 hex | rgb | rgba.
-     * @param array $validate - 字段验证
-     * @param string $placeholder - 提示语句
-     * @param string $help - 提示语句
-     * @param int $itemCol - 默认表单项宽度
+     * @param array $config - 更多配置
      * @throws Exception
      * @return FormBuilder
      */
-    public function addColor($name, string $title = '', string $type = 'rgba', array $validate = [], string $placeholder = '', string $help = '', int $itemCol = 12) {
-        if (is_array($name)) {
-            $itemCol = get_sub_value('width', $name, $itemCol);
-            $help = get_sub_value('help', $name, '');
-            $placeholder = get_sub_value('placeholder', $name, '');
-            $validate = get_sub_value('validate', $name, []);
-            $title = get_sub_value('title', $name, '');
-            $type = get_sub_value('list', $name, $type);
-            $name = get_sub_value('name', $name, '');
-        }
+    public function addColor($name, string $title = '', array $config = []) {
         $this->autoloadAssets('color', 'all');
-        $value = str_replace('"', '\'', $this->getFormData($name, ''));
-        $id = $this->createId($name, $this->formConfig['form_id']);
-        $assign = [
-            'name'        => $name,
-            'id'          => $id,
-            'value'       => $value,
-            'format'      => $type,
-            'placeholder' => addslashes(strip_tags($placeholder))
-        ];
-        $this->assign($assign);
+        $config = $this->iniFormItemConfig($name, $title, $config);
+        $config[self::value] = addslashes($this->getFormData($config[self::name], $config[self::value]));
+        $config[self::type] = self::form_color;
+        //  颜色类型 hex | rgb | rgba
+        $config['format'] = get_sub_value('format', $config, 'rgba');
+        $this->assign($config);
         $content = $this->fetch('color');
-        $this->curHtml = $this->addItem($id, $name, $content, $title, $validate, $help, $itemCol);
-        return $this;
-    }
-    
-    /**
-     * 添加单行文本框
-     * @param $name - name
-     * @param string $title - 标题
-     * @param array $validate - 字段验证
-     * @param string $placeholder - 提示语句
-     * @param string $help - 提示语句
-     * @param int $itemCol - 默认表单项宽度
-     * @throws Exception
-     * @return FormBuilder
-     */
-    public function addText($name, string $title = '', array $validate = [], string $placeholder = '', string $help = '', int $itemCol = 12) {
-        if (is_array($name)) {
-            $itemCol = get_sub_value('width', $name, $itemCol);
-            $help = get_sub_value('help', $name, '');
-            $placeholder = get_sub_value('placeholder', $name, '');
-            $validate = get_sub_value('validate', $name, []);
-            $title = get_sub_value('title', $name, '');
-            $name = get_sub_value('name', $name, '');
-        }
-        $value = str_replace('"', '\'', $this->getFormData($name, ''));
-        $id = $this->createId($name, $this->formConfig['form_id']);
-        $assign = [
-            'name'        => $name,
-            'id'          => $id,
-            'value'       => $value,
-            'placeholder' => addslashes(strip_tags($placeholder))
-        ];
-        $this->assign($assign);
-        $content = $this->fetch('input');
-        $this->curHtml = $this->addItem($id, $name, $content, $title, $validate, $help, $itemCol);
+        $this->curHtml = $this->addItem($content, $config);
         return $this;
     }
     
     /**
      * 添加单行文本框列表
-     * @param $name - name
+     * @param string|array $name - 表单元素name属性名
      * @param string $title - 标题
-     * @param array $validate - 字段验证
-     * @param string $placeholder - 提示语句
-     * @param string $help - 提示语句
-     * @param int $itemCol - 默认表单项宽度
+     * @param array $config - 更多配置
      * @throws Exception
      * @return FormBuilder
      */
-    public function addTexts($name, string $title = '', array $validate = [], string $placeholder = '', string $help = '', int $itemCol = 12) {
-        if (is_array($name)) {
-            $itemCol = get_sub_value('width', $name, $itemCol);
-            $placeholder = get_sub_value('placeholder', $name, '');
-            $help = get_sub_value('help', $name, '');
-            $validate = get_sub_value('validate', $name, []);
-            $title = get_sub_value('title', $name, '');
-            $name = get_sub_value('name', $name, '');
-        }
-        $this->autoloadAssets('sortable', 'js');
-        $value = $this->unSerialize($this->getFormData($name, []), false);
-        $id = $this->createId($name, $this->formConfig['form_id']);
-        $assign = [
-            'name'        => $name,
-            'id'          => $id,
-            'value'       => $value,
-            'placeholder' => addslashes(strip_tags($placeholder))
-        ];
-        $this->assign($assign);
-        $content = $this->fetch('input-list');
-        $this->curHtml = $this->addItem($id, $name, $content, $title, $validate, $help, $itemCol);
+    public function addTexts($name, string $title = '', array $config = []) {
+        $this->autoloadAssets('sortable', 'all');
+        $config = $this->iniFormItemConfig($name, $title, $config);
+        $config[self::value] = $this->unSerialize($this->getFormData($config[self::name], $config[self::value]), false);
+        $config[self::type] = self::form_texts;
+        $this->assign($config);
+        $content = $this->fetch('texts');
+        $this->curHtml = $this->addItem($content, $config);
         return $this;
     }
     
     /**
      * 添加多行文本域
-     * @param $name - name
+     * @param string|array $name - 表单元素name属性名
      * @param string $title - 标题
-     * @param int $rows - 行数
-     * @param array $validate - 字段验证
-     * @param string $placeholder - 提示语句
-     * @param string $help - 提示语句
-     * @param int $itemCol - 默认表单项宽度
+     * @param array $config - 更多配置
      * @throws Exception
      * @return FormBuilder
      */
-    public function addTextArea($name, string $title = '', array $validate = [], string $placeholder = '', string $help = '', int $rows = 4, int $itemCol = 12) {
-        if (is_array($name)) {
-            $itemCol = get_sub_value('width', $name, $itemCol);
-            $rows = get_sub_value('rows', $name, 4);
-            $placeholder = get_sub_value('placeholder', $name, '');
-            $help = get_sub_value('help', $name, '');
-            $validate = get_sub_value('validate', $name, []);
-            $title = get_sub_value('title', $name, '');
-            $name = get_sub_value('name', $name, '');
-        }
-        $value = $this->getFormData($name, '');
-        $id = $this->createId($name, $this->formConfig['form_id']);
-        $assign = [
-            'name'        => $name,
-            'id'          => $id,
-            'value'       => $value,
-            'placeholder' => addslashes(strip_tags($placeholder)),
-            'rows'        => $rows
-        ];
-        $this->assign($assign);
-        $content = $this->fetch('textarea');
-        $this->curHtml = $this->addItem($id, $name, $content, $title, $validate, $help, $itemCol);
+    public function addTextArea($name, string $title = '', array $config = []) {
+        $config = $this->iniFormItemConfig($name, $title, $config);
+        $config[self::value] = $this->getFormData($name, $config[self::value]);
+        $config[self::type] = self::form_text_area;
+        $config['rows'] = get_sub_value('rows', $config, 4);
+        $this->assign($config);
+        $content = $this->fetch('text_area');
+        $this->curHtml = $this->addItem($content, $config);
         return $this;
     }
     
     /**
      * 添加多行文本域列表
-     * @param $name - name
+     * @param string|array $name - 表单元素name属性名
      * @param string $title - 标题
-     * @param int $rows - 行数
-     * @param array $validate - 字段验证
-     * @param string $placeholder - 提示语句
-     * @param string $help - 提示语句
-     * @param int $itemCol - 默认表单项宽度
+     * @param array $config - 更多配置
      * @throws Exception
      * @return FormBuilder
      */
-    public function addTextAreas($name, string $title = '', array $validate = [], string $placeholder = '', string $help = '', int $rows = 4, int $itemCol = 12) {
-        if (is_array($name)) {
-            $itemCol = get_sub_value('width', $name, $itemCol);
-            $rows = get_sub_value('rows', $name, 4);
-            $placeholder = get_sub_value('placeholder', $name, '');
-            $help = get_sub_value('help', $name, '');
-            $validate = get_sub_value('validate', $name, []);
-            $title = get_sub_value('title', $name, '');
-            $name = get_sub_value('name', $name, '');
-        }
-        $this->autoloadAssets('sortable', 'js');
-        $value = $this->unSerialize($this->getFormData($name, []), false);
-        $id = $this->createId($name, $this->formConfig['form_id']);
-        $assign = [
-            'name'        => $name,
-            'id'          => $id,
-            'value'       => $value,
-            'placeholder' => addslashes(strip_tags($placeholder)),
-            'rows'        => $rows
-        ];
-        $this->assign($assign);
-        $content = $this->fetch('textarea-list');
-        $this->curHtml = $this->addItem($id, $name, $content, $title, $validate, $help, $itemCol);
+    public function addTextAreas($name, string $title = '', array $config = []) {
+        $this->autoloadAssets('sortable', 'all');
+        $config = $this->iniFormItemConfig($name, $title, $config);
+        $config[self::value] = $this->unSerialize($this->getFormData($config[self::name], $config[self::value]), false);
+        $config[self::type] = self::form_text_areas;
+        $config['rows'] = get_sub_value('rows', $config, 4);
+        $this->assign($config);
+        $content = $this->fetch('text_areas');
+        $this->curHtml = $this->addItem($content, $config);
         return $this;
     }
     
     /**
      * 添加单选按钮
-     * @param $name - name
+     * @param string|array $name - 表单元素name属性名
      * @param string $title - 标题
-     * @param $list - 可选项列表
-     * @param array $validate - 字段验证
-     * @param string $help - 提示语句
-     * @param int $itemCol - 默认表单项宽度
+     * @param array $config - 更多配置
      * @throws Exception
      * @return FormBuilder
      */
-    public function addRadio($name, string $title = '', array $list = [], array $validate = [], string $help = '', int $itemCol = 12) {
-        if (is_array($name)) {
-            $itemCol = get_sub_value('width', $name, $itemCol);
-            $help = get_sub_value('help', $name, '');
-            $validate = get_sub_value('validate', $name, []);
-            $list = get_sub_value('list', $name, []);
-            $title = get_sub_value('title', $name, '');
-            $name = get_sub_value('name', $name, '');
+    public function addRadio($name, string $title = '', array $config = []) {
+        $config = $this->iniFormItemConfig($name, $title, $config);
+        $list = $config[self::lists] = $this->unSerialize($config[self::lists], false);
+        $value = $config[self::value] = addslashes($this->getFormData($config[self::name], $config[self::value]));
+        $config[self::type] = self::form_radio;
+        $listKey = array_keys($list);
+        if (!in_array($value, $listKey)) {
+            $value = $listKey[0];
         }
-        $value = $this->getFormData($name, false);
-        $list = $this->unSerialize($list);
-        $id = $id = $this->createId($name, $this->formConfig['form_id']);
-        $list_key = array_keys($list);
-        if ($value === false || !in_array($value, $list_key)) {
-            $value = $list_key[0];
-        }
-        $assign = [
-            'name'        => $name,
-            'value'       => str_replace('"', '\'', $value),
-            'placeholder' => addslashes(strip_tags($help)),
-            'list'        => $list,
-        ];
-        $this->assign($assign);
+        $config[self::value] = $value;
+        $this->assign($config);
         $content = $this->fetch('radio');
-        $this->curHtml = $this->addItem($id, $name, $content, $title, $validate, $help, $itemCol);
+        $this->curHtml = $this->addItem($content, $config);
         return $this;
     }
     
     /**
      * 添加多选按钮
-     * @param $name
-     * @param array $list
-     * @param string $title
-     * @param array $validate - 字段验证
-     * @param string $help - 提示语句
-     * @param int $itemCol - 默认表单项宽度
+     * @param string|array $name - 表单元素name属性名
+     * @param string $title - 标题
+     * @param array $config - 更多配置
      * @throws Exception
      * @return FormBuilder
      */
-    public function addCheckbox($name, string $title = '', array $list = [], array $validate = [], string $help = '', int $itemCol = 12) {
-        if (is_array($name)) {
-            $itemCol = get_sub_value('width', $name, $itemCol);
-            $help = get_sub_value('help', $name, '');
-            $validate = get_sub_value('validate', $name, []);
-            $list = get_sub_value('list', $name, []);
-            $title = get_sub_value('title', $name, '');
-            $name = get_sub_value('name', $name, '');
-        }
-        $value = $this->unSerialize($this->getFormData($name, []));
-        $list = $this->unSerialize($list);
-        $id = $this->createId($name, $this->formConfig['form_id']);
-        $assign = [
-            'name'        => $name,
-            'value'       => $value,
-            'placeholder' => addslashes(strip_tags($help)),
-            'list'        => $list,
-        ];
-        $this->assign($assign);
+    public function addCheckbox($name, string $title = '', array $config = []) {
+        $config = $this->iniFormItemConfig($name, $title, $config);
+        $config[self::lists] = $this->unSerialize($config[self::lists], false);
+        $config[self::value] = $this->unSerialize($this->getFormData($config[self::name], $config[self::value]));
+        $config[self::type] = self::form_checkbox;
+        $this->assign($config);
         $content = $this->fetch('checkbox');
-        $this->curHtml = $this->addItem($id, $name, $content, $title, $validate, $help, $itemCol);
+        $this->curHtml = $this->addItem($content, $config);
         return $this;
     }
     
     /**
      * 添加下拉选项框
-     * @param $name
-     * @param array $list 多选列表
-     * @param string $title
-     * @param array $validate - 字段验证
-     * @param bool $isMultiple - 是否多选
-     * @param string $placeholder - 提示语句
-     * @param string $help - 提示语句
-     * @param int $itemCol - 默认表单项宽度
+     * @param string|array $name - 表单元素name属性名
+     * @param string $title - 标题
+     * @param array $config - 更多配置
      * @throws Exception
      * @return FormBuilder
      */
-    public function addSelect($name, string $title = '', array $list = [], array $validate = [], string $placeholder = '', string $help = '', bool $isMultiple = false, int $itemCol = 12) {
-        if (is_array($name)) {
-            $itemCol = get_sub_value('width', $name, $itemCol);
-            $placeholder = get_sub_value('placeholder', $name, '');
-            $help = get_sub_value('help', $name, '');
-            $isMultiple = get_sub_value('is_multiple', $name, false);
-            $validate = get_sub_value('validate', $name, []);
-            $list = get_sub_value('list', $name, []);
-            $title = get_sub_value('title', $name, '');
-            $name = get_sub_value('name', $name, '');
-        }
+    public function addSelect($name, string $title = '', array $config = []) {
         $this->autoloadAssets('select', 'all');
-        $value = $this->unSerialize($this->getFormData($name, ''));
-        $list = $this->unSerialize($list);
-        $id = $this->createId($name, $this->formConfig['form_id']);
-        $listValue = array_values($list);
+        $config = $this->iniFormItemConfig($name, $title, $config);
+        $config[self::lists] = $this->unSerialize($config[self::lists], false);
+        $config[self::value] = $this->unSerialize($this->getFormData($config[self::name], $config[self::value]));
+        $config[self::type] = self::form_select;
+        $listValue = array_values($config[self::lists]);
         $isGroup = isset($listValue[0]) && is_array($listValue[0]) ? true : false;
-        $assign = [
-            'name'        => $name,
-            'id'          => $id,
-            'value'       => $value,
-            'placeholder' => addslashes(strip_tags($placeholder)),
-            'list'        => $list,
-            'is_multiple' => ($isMultiple == true) ? true : false,
-            'is_group'    => $isGroup,
-        ];
-        $this->assign($assign);
+        $config['group'] = $isGroup;
+        $config[self::multiple] = $this->getBoolVal(get_sub_value(self::multiple, $config, false));
+        $this->assign($config);
         $content = $this->fetch('select');
-        $this->curHtml = $this->addItem($id, $name, $content, $title, $validate, $help, $itemCol);
+        $this->curHtml = $this->addItem($content, $config);
         return $this;
     }
     
     /**
      * 添加switch开关
-     * @param $name - name值
+     * @param string|array $name - 表单元素name属性名
      * @param string $title - 标题
-     * @param $list - 可选项列表
-     * @param array $validate - 字段验证
-     * @param string $help - 提示语句
-     * @param int $itemCol - 默认表单项宽度
+     * @param array $config - 更多配置
      * @throws Exception
      * @return FormBuilder
      */
-    public function addSwitch($name, string $title = '', array $list = [], array $validate = [], string $help = '', int $itemCol = 12) {
-        if (is_array($name)) {
-            $itemCol = get_sub_value('width', $name, $itemCol);
-            $help = get_sub_value('help', $name, '');
-            $validate = get_sub_value('validate', $name, []);
-            $list = get_sub_value('list', $name, []);
-            $title = get_sub_value('title', $name, '');
-            $name = get_sub_value('name', $name, '');
-        }
+    public function addSwitch($name, string $title = '', array $config = []) {
         $this->autoloadAssets('switch', 'all');
-        $value = $this->getFormData($name, '');
-        $list = $this->unSerialize($list, false);
-        $id = $this->createId($name, $this->formConfig['form_id']);
+        $config = $this->iniFormItemConfig($name, $title, $config);
+        $list = $config[self::lists] = $this->unSerialize($config[self::lists], false);
+        $value = addslashes($this->getFormData($config[self::name], $config[self::value]));
         $off = get_sub_value(0, array_values($list), 0);
         $on = get_sub_value(1, array_values($list), 1);
-        $assign = [
-            'name'        => $name,
-            'id'          => $id,
-            'placeholder' => addslashes(strip_tags($help)),
-            'value'       => empty($value) ? 0 : $value,
-            'off'         => empty($off) ? 0 : $off,
-            'on'          => empty($on) ? 0 : $on,
-        ];
-        $this->assign($assign);
+        $config[self::type] = self::form_switch;
+        $config[self::value] = empty($value) ? 0 : $value;
+        $config['off'] = empty($off) ? 0 : $off;
+        $config['on'] = empty($on) ? 0 : $on;
+        $this->assign($config);
         $content = $this->fetch('switch');
-        $this->curHtml = $this->addItem($id, $name, $content, $title, $validate, $help, $itemCol);
+        $this->curHtml = $this->addItem($content, $config);
         return $this;
     }
     
     /**
      * 添加坐标拾取器
-     * @param $name - name
+     * @param string|array $name - 表单元素name属性名
      * @param string $title - 标题
-     * @param array $validate - 字段验证
-     * @param string $help - 提示语句
-     * @param int $itemCol - 默认表单项宽度
+     * @param array $config - 更多配置
      * @throws Exception
      * @return FormBuilder
      */
-    public function addMap($name, string $title = '', array $validate = [], string $help = '', int $itemCol = 12) {
-        if (is_array($name)) {
-            $itemCol = get_sub_value('width', $name, $itemCol);
-            $help = get_sub_value('help', $name, '');
-            $validate = get_sub_value('validate', $name, []);
-            $title = get_sub_value('title', $name, '');
-            $name = get_sub_value('name', $name, '');
-        }
-        $this->autoloadAssets('map', 'js');
-        $value = $this->unSerialize($this->getFormData($name, []), false);
-        $id = $this->createId($name, $this->formConfig['form_id']);
-        $assign = [
-            'name'     => $name,
-            'id'       => $id,
-            'value'    => $value,
-            'location' => get_sub_value('location', $value, implode(',', $value)),
-            'address'  => get_sub_value('address', $value, ''),
-        ];
-        $this->assign($assign);
+    public function addMap($name, string $title = '', array $config = []) {
+        $this->autoloadAssets('map', 'all');
+        $config = $this->iniFormItemConfig($name, $title, $config);
+        $value = $config[self::value] = $this->unSerialize($this->getFormData($config[self::name], $config[self::value]), false);
+        $config[self::type] = self::form_map;
+        $config['location'] = get_sub_value('location', $value, implode(',', $value));
+        $config['address'] = get_sub_value('address', $value, '');
         $content = $this->fetch('map');
-        $this->curHtml = $this->addItem($id, $name, $content, $title, $validate, $help, $itemCol);
+        $this->curHtml = $this->addItem($content, $config);
         return $this;
     }
     
@@ -809,35 +583,62 @@ class FormBuilder extends Builder
     
     /**
      * 构建表单Item样式
-     * @param string $id
-     * @param string $name
-     * @param string $content
-     * @param string $title
-     * @param array $validate - 字段验证
-     * @param string $help - 提示语句
-     * @param int $itemCol - 默认表单项宽度
+     * @param string $content - 表单HTML内容
+     * @param array $config - 整合后的配置
      * @throws Exception
      * @return string
      */
-    protected function addItem(string $id, string $name, string $content, string $title = '', array $validate = [], string $help = '', int $itemCol = 12) {
-        $title = empty($title) ? $name : $title;
+    protected function addItem(string $content, array $config) {
+        $itemWidth = 12 - $this->formConfig['width'];
         $assign = [
-            'id'        => $id,
-            'width'     => $this->formConfig['col_width'],
-            'col_width' => 12 - $this->formConfig['col_width'],
-            'title'     => $title,
-            'help'      => $help,
-            'help_type' => get_sub_value('help_type', $this->config, 'block'),
-            'content'   => $content,
-            'item_col'  => $itemCol,
+            'content'     => $content,
+            'id'          => $config[self::id],
+            'label_width' => $this->formConfig['width'],
+            'item_width'  => $itemWidth == 0 ? 12 : $itemWidth,
+            'title'       => $config[self::title],
+            'help'        => $config[self::tip],
+            'width'       => $config[self::width],
+            'type'        => $config[self::type],
         ];
         $this->assign($assign);
         $html = htmlspecialchars_decode($this->fetch('item'));
         $this->html .= $html;
-        if ($validate && is_array($validate) && count($validate) >= 1) {
-            $this->addValidate($name, $validate);
-        }
         return $html;
+    }
+    
+    /**
+     * 表单元素配置初始化
+     * @param string|array $name - 表单元素name属性名
+     * @param string $title - 标题
+     * @param array $config - 更多配置
+     * @return array
+     */
+    protected function iniFormItemConfig($name, string $title = '', array $config = []) {
+        $defaultConfig = [
+            self::tip         => '',
+            self::placeholder => '',
+            self::width       => 12,
+            self::class_list  => '',
+            self::value       => '',
+            self::lists       => [],
+            self::disabled    => false,
+            self::readonly    => false,
+        ];
+        if (is_array($name)) {
+            $config = $name;
+        } else {
+            $config[self::name] = $name;
+            $config[self::title] = $title;
+        }
+        $config[self::id] = $this->createId($config[self::name], $this->formConfig['form_id']);
+        $config[self::placeholder] = addslashes(strip_tags($config[self::placeholder]));
+        $config[self::disabled] = $this->getBoolVal($config[self::disabled]);
+        $config[self::readonly] = $this->getBoolVal($config[self::readonly]);
+        if (isset($config[self::validate]) && is_array($config[self::validate]) && count($config[self::validate]) >= 1) {
+            $this->addValidate($config[self::name], $config[self::validate]);
+            unset($config[self::validate]);
+        }
+        return array_merge($defaultConfig, $config);
     }
     
     /**
@@ -882,9 +683,7 @@ class FormBuilder extends Builder
         }
         $assign = [
             'validate_config' => $validateConfig,
-            'redirect_url'    => $redirectUrl,
-            'base_url_upload' => urlencode('uploads'),
-            'base_url_static' => urlencode('static'),
+            'redirect_url'    => $redirectUrl
         ];
         $this->assign($assign);
         $html = $this->fetch('validate');

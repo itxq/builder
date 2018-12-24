@@ -1,10 +1,9 @@
 <div class="control-label text-left">
     {{foreach $list as $k => $v}}
     <label class="demo--label" for="{{$id}}{{$name}}_{{$k}}">
-        <input class="demo--radio" type="radio" name="{{$name}}" id="{{$id}}{{$name}}_{{$k}}" value="{{$k}}" placeholder="{{$k}}"
-        {{if $k == $value}}checked="checked"{{/if}}>
+        <input class="demo--radio {{$class}}" type="radio" name="{{$name}}" id="{{$id}}{{$name}}_{{$k}}" value="{{$k}}" placeholder="{{$k}}"
+        {{if $k == $value}}checked="checked"{{/if}} {{$disabled ? 'disabled="disabled"':''}} {{$readonly ? 'onclick="return false;"':''}}>
         <span class="demo--radioInput"></span><span class="demo--radioInput-help">{{$v}}</span>
     </label>
     {{/foreach}}
 </div>
-<input type="hidden" name="build_form_type[{{$name}}]" value="radio">

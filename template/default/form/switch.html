@@ -1,2 +1,3 @@
 <input type="hidden" name="{{$name}}" id="hidden_{{$id}}" value="{{$off}}">
-<input placeholder="{{$placeholder}}" type="checkbox" value="{{$on}}" name="{{$name}}" id="{{$id}}" class="bootstrap-switch-item" {{if $on == $value}}checked="checked"{{/if}}>
+<input placeholder="{{$placeholder}}" type="checkbox" value="{{$on}}" name="{{$name}}" id="{{$id}}" class="bootstrap-switch-item {{$class}}"
+       {{if $on == $value}}checked="checked"{{/if}} {{$disabled ? 'disabled="disabled"':''}} {{$readonly ? 'readonly="readonly"':''}}>
