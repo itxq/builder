@@ -413,7 +413,9 @@ abstract class Builder
      */
     protected function getTrueUrl(string $url) {
         $url = $this->tplReplaceString($url);
-        if (strpos($url, '//') === 0) {
+        if (empty($url)) {
+            $trueUrl = '';
+        } else if (strpos($url, '//') === 0) {
             $trueUrl = Request::scheme() . ':' . $url;
         } else if (strpos($url, '/') === 0) {
             $trueUrl = Request::domain() . $url;
