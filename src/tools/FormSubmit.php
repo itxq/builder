@@ -12,7 +12,7 @@
 
 namespace itxq\tools;
 
-use itxq\builder\FormBuilder;
+use itxq\builder\Form;
 use think\facade\Request;
 use think\Response;
 
@@ -32,7 +32,7 @@ class FormSubmit
     const COLOR = 'color';
     const TAGS = 'tags';
     
-    public static function submit(FormBuilder $builder, string $pk = 'id', array $allowData = []) {
+    public static function submit(Form $builder, string $pk = 'id', array $allowData = []) {
         //var_dump(Request::file('input-gly'));
         $formData = self::getFormData($builder, $pk, $allowData);
         self::success('提交成功', $formData);
@@ -42,12 +42,12 @@ class FormSubmit
     
     /**
      * 获取表单数据，并进行处理
-     * @param FormBuilder $builder - 表单构建器
+     * @param Form $builder - 表单构建器
      * @param string $pk - 主键名，默认为ID
      * @param array $allowField - 允许提交的字段
      * @return array - 返回表单数据
      */
-    protected static function getFormData(FormBuilder $builder, string $pk = 'id', array $allowField = []) {
+    protected static function getFormData(Form $builder, string $pk = 'id', array $allowField = []) {
         $data = Request::post();
         $type = [];
         if (isset($data['build_form_type'])) {
@@ -73,13 +73,13 @@ class FormSubmit
     
     /**
      * 数据处理
-     * @param FormBuilder $builder - 表单构建器
+     * @param Form $builder - 表单构建器
      * @param string $name - 字段名
      * @param $value - 字段值
      * @param array $type - 字段类型
      * @return mixed 返回处理好的数据
      */
-    protected static function handleData(FormBuilder $builder, string $name, $value, array $type) {
+    protected static function handleData(Form $builder, string $name, $value, array $type) {
         $type = get_sub_value($name, $type, false);
         if ($type === self::JSON) {
             $value = $builder->unSerialize($value);

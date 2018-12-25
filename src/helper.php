@@ -32,14 +32,14 @@ if (!function_exists('create_form')) {
      * @param int $width - 表单label宽度
      * @param string $template - 使用模板名
      * @param array $config - 更多配置项
-     * @return \itxq\builder\FormBuilder
+     * @return \itxq\builder\Form
      * @throws \think\Exception
      */
-    function create_form(array $data = [], int $width = 0, string $template = 'default', array $config = []) {
+    function create_form(array $data = [], int $width = 0, string $template = 'default2', array $config = []) {
         $config['data'] = $data;
         $config['width'] = $width;
-        $config['template_name'] = $template;
-        $formBuilder = new \itxq\builder\FormBuilder($config);
+        $formBuilder = new \itxq\builder\Form($config);
+        $formBuilder->setTemplateName($template);
         return $formBuilder;
     }
 }
