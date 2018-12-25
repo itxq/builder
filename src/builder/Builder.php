@@ -111,11 +111,10 @@ abstract class Builder
      *  'data'  =>  [], // 表单默认数据
      *  'width'  =>  2, // 表单label宽度
      * ]
-     * @throws Exception
      */
     public function __construct(array $config = []) {
         $this->template = get_sub_value('template_name', $config, 'default');
-        $this->rootPath = realpath(get_sub_value('template_path', $config, __DIR__ . '/../template')) . DIRECTORY_SEPARATOR;
+        $this->rootPath = realpath(get_sub_value('template_path', $config, __DIR__ . '/../../template')) . DIRECTORY_SEPARATOR;
         $this->assetPath = realpath(get_sub_value('assets_path', $config, __DIR__ . '/../../assets')) . DIRECTORY_SEPARATOR;
         $this->type = get_sub_value('type', $config, '');
         $this->jsHook = get_sub_value('js_hook', $config, 'hook_js');
@@ -145,7 +144,7 @@ abstract class Builder
     /**
      * 添加额外的JS
      * @param $js - js代码
-     * @return $this | FormBuilder | TableBuilder | Builder
+     * @return $this | Form | Table | Builder
      */
     public function addJs($js) {
         builder_event_listen($this->jsHook, function () use ($js) {
@@ -157,7 +156,7 @@ abstract class Builder
     /**
      * 添加额外的CSS
      * @param $css - css代码
-     * @return $this | FormBuilder | TableBuilder | Builder
+     * @return $this | Form | Table | Builder
      */
     public function addCss($css) {
         builder_event_listen($this->cssHook, function () use ($css) {
