@@ -29,19 +29,19 @@ abstract class Builder
      * js挂载点名称
      * @var string
      */
-    protected $jsHook = 'hook_js';
+    protected $jsHook;
     
     /**
      * css挂载点名称
      * @var string
      */
-    protected $cssHook = 'hook_css';
+    protected $cssHook;
     
     /**
      * 构建类型 form | table
      * @var string
      */
-    protected $type = '';
+    protected $type;
     
     /**
      * 视图类实例
@@ -59,13 +59,13 @@ abstract class Builder
      * 根目录
      * @var string
      */
-    protected $rootPath = '';
+    protected $rootPath;
     
     /**
      * 静态资源默认目录
      * @var string
      */
-    protected $assetPath = '';
+    protected $assetPath;
     
     /**
      * 模板根目录
@@ -77,7 +77,7 @@ abstract class Builder
      * 模板目录名
      * @var string
      */
-    protected $template = 'default';
+    protected $template;
     
     /**
      * html字符串
@@ -115,66 +115,31 @@ abstract class Builder
      */
     public function __construct(array $config = []) {
         $this->template = get_sub_value('template_name', $config, 'default');
-        $this->rootPath = realpath(get_sub_value('template_path', $config, __DIR__ . '/../template'));
-        $this->assetPath = realpath(get_sub_value('assets_path', $config, __DIR__ . '/../../assets'));
+        $this->rootPath = realpath(get_sub_value('template_path', $config, __DIR__ . '/../template')) . DIRECTORY_SEPARATOR;
+        $this->assetPath = realpath(get_sub_value('assets_path', $config, __DIR__ . '/../../assets')) . DIRECTORY_SEPARATOR;
         $this->type = get_sub_value('type', $config, '');
-        if (isset($config['js_hook']) && !empty($config['js_hook'])) {
-            $this->jsHook = $config['js_hook'];
-        }
-        if (isset($config['css_hook']) && !empty($config['css_hook'])) {
-            $this->cssHook = $config['css_hook'];
-        }
-        if (empty($this->template)) {
-            throw new Exception('未设置模板名称');
-        }
-        if (!is_dir($this->rootPath)) {
-            throw new Exception('未设置模板根目录');
-        }
-        if (!is_dir($this->assetPath)) {
-            throw new Exception('未设置静态资源根目录');
-        }
-        $this->assetPath .= DIRECTORY_SEPARATOR;
-        $this->rootPath .= DIRECTORY_SEPARATOR;
+        $this->jsHook = get_sub_value('js_hook', $config, 'hook_js');
+        $this->cssHook = get_sub_value('css_hook', $config, 'hook_css');
         if (get_sub_value('jquery', $config, false)) {
             $this->autoloadAssets('jquery', 'js');
         }
         if (get_sub_value('bootstrap', $config, false)) {
             $this->autoloadAssets('bootstrap', 'all');
         }
-        $this->viewConfig = $this->getViewConfig('template');
-        // 模板引擎普通标签开始标记
-        $this->viewConfig['tpl_begin'] = '{{';
-        // 模板引擎普通标签结束标记
-        $this->viewConfig['tpl_end'] = '}}';
-        // 标签库标签开始标记
-        $this->viewConfig['taglib_begin'] = '{{';
-        // 标签库标签结束标记
-        $this->viewConfig['taglib_end'] = '}}';
         $this->getAssets();
-        $this->view = new View();
-        $this->view->init($this->viewConfig);
-        $assign = [
-            'css_hook' => $this->cssHook,
-            'js_hook'  => $this->jsHook,
-        ];
+        $this->viewInit();
+        $assign = ['css_hook' => $this->cssHook, 'js_hook' => $this->jsHook];
         $this->assign($assign);
     }
     
     /**
-     * 获取模板完整路径
-     * @param $template - 模板名
-     * @return string - 完整路径
+     * 设置模板名称
+     * @param $template
+     * @return $this
      */
-    protected function getTemplateFilePath(string $template) {
-        $path = $this->rootPath . $this->template . DIRECTORY_SEPARATOR;
-        if (!is_dir($path)) {
-            $path = $this->rootPath . 'default' . DIRECTORY_SEPARATOR;
-        }
-        if (!empty($this->type)) {
-            $path .= $this->type . DIRECTORY_SEPARATOR;
-        }
-        $path .= $template . '.' . $this->viewConfig['view_suffix'];
-        return $path;
+    public function setTemplateName($template) {
+        $this->template = $template;
+        return $this;
     }
     
     /**
@@ -236,18 +201,18 @@ abstract class Builder
      * @param bool $isJsonType - 是否转换为json键值对的形式
      * @return array
      */
-    public function unSerialize($list, bool $isJsonType = false) {
+    public function unSerialize($list, bool $isJsonType = false): array {
         // 对普通字符串进行简析
         if (is_string($list)) {
             $list = $this->tplReplaceString($list);
-            if (preg_match('/^\{.*?\}$/', $list) || preg_match('/^\[.*?\]$/', $list)) {
+            if (empty($list)) {
+                $list = [];
+            } else if (preg_match('/^{{.*?}}$/', $list)) {
+                $list = $this->unSerialize($this->display($list));
+            } else if (preg_match('/^{.*?}$/', $list) || preg_match('/^[.*?]$/', $list)) {
                 $list = json_decode($list, true);
             } else if (preg_match('/^a:.*?(})$/', $list)) {
                 $list = unserialize($list);
-            } else if (preg_match('/^{{\:serialize.*?}}$/', $list) || preg_match('/^{{.*?}}$/', $list)) {
-                $list = $this->unSerialize($this->display($list));
-            } else if (empty($list)) {
-                $list = [];
             } else {
                 $list = explode(',', $list);
             }
@@ -279,7 +244,7 @@ abstract class Builder
      * 返回当前字符串
      * @return string
      */
-    public function getCurHtml() {
+    public function getCurHtml(): string {
         return $this->curHtml;
     }
     
@@ -287,7 +252,7 @@ abstract class Builder
      * 返回全部HTML字符串
      * @return string
      */
-    public function returnHtml() {
+    public function returnHtml(): string {
         return $this->html;
     }
     
@@ -296,7 +261,7 @@ abstract class Builder
      * @param string|int|bool $val - 原始变量
      * @return bool 布尔值
      */
-    protected function getBoolVal($val) {
+    protected function getBoolVal($val): bool {
         if ($val === '1' || $val === true || $val === 1 || $val === 'true') {
             return true;
         } else {
@@ -308,9 +273,9 @@ abstract class Builder
      * 创建ID
      * @param string $name - 名称
      * @param bool|string $isRound - 是否添加随机数(true添加，为字符串时表示前缀)
-     * @return mixed
+     * @return string
      */
-    protected function createId(string $name, $isRound = true) {
+    protected function createId(string $name, $isRound = true): string {
         $prefix = is_string($isRound) ? $isRound : 'builder_auto_create_';
         $search = ['[', ']'];
         $replace = ['_', '_'];
@@ -321,17 +286,11 @@ abstract class Builder
     /**
      * 渲染内容输出
      * @param $data
-     * @return mixed
+     * @return string
      */
-    protected function display(string $data) {
+    protected function display(string $data): string {
         $data = htmlspecialchars_decode($data);
-        if (preg_match('/^{{\:serialize.*?}}$/', $data)) {
-            $data = unserialize($this->view->display($data));
-        } else if (preg_match('/^{{\:json_encode.*?}}$/', $data)) {
-            $data = json_decode($this->view->display($data), true);
-        } else if (preg_match('/^{{.*?}}$/', $data)) {
-            $data = $this->view->display($data);
-        }
+        $data = $this->view->display($data);
         return $data;
     }
     
@@ -343,7 +302,7 @@ abstract class Builder
      * @throws Exception
      * @throws \Exception
      */
-    protected function fetch(string $template = '', array $vars = []) {
+    protected function fetch(string $template = '', array $vars = []): string {
         $template = $this->getTemplateFilePath($template);
         if (!is_file($template)) {
             throw new Exception('模板文件{' . $template . '}不存在');
@@ -354,11 +313,10 @@ abstract class Builder
     /**
      * 模板变量赋值
      * @param  array $vars 要显示的模板变量
-     * @return $this
+     * @return void
      */
-    protected function assign(array $vars) {
+    protected function assign(array $vars): void {
         $this->view->assign($vars);
-        return $this;
     }
     
     /**
@@ -366,7 +324,7 @@ abstract class Builder
      * @param string $name - 文件名
      * @return array
      */
-    protected function getViewConfig(string $name = 'template') {
+    protected function getViewConfig(string $name = 'template'): array {
         $path = $this->rootPath . $this->template . DIRECTORY_SEPARATOR;
         if (!is_dir($path)) {
             $path = $this->rootPath . 'default' . DIRECTORY_SEPARATOR;
@@ -386,7 +344,7 @@ abstract class Builder
      * @param string $type
      * @return string
      */
-    protected function handleAssets(string $assetsName, array $config, string $type) {
+    protected function handleAssets(string $assetsName, array $config, string $type): string {
         $assetsHtml = '';
         $defineName = 'AUTOLOAD_ASSETS_' . strtoupper($assetsName) . '_' . strtoupper($type) . '_0';
         if (defined($defineName)) {
@@ -409,9 +367,9 @@ abstract class Builder
     /**
      * 获取完整的URL路径
      * @param string $url
-     * @return mixed|string
+     * @return string
      */
-    protected function getTrueUrl(string $url) {
+    protected function getTrueUrl(string $url): string {
         $url = $this->tplReplaceString($url);
         if (empty($url)) {
             $trueUrl = '';
@@ -473,9 +431,9 @@ abstract class Builder
      * 生成随机字符串
      * @param int $length - 指定生成字符串的长度
      * @param string $type - 指定生成字符串的类型（all-全部，num-纯数字，letter-纯字母）
-     * @return null|string
+     * @return string
      */
-    protected function cmRound(int $length = 4, string $type = 'all') {
+    protected function cmRound(int $length = 4, string $type = 'all'): string {
         $str = '';
         $strUp = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
         $strLow = 'abcdefghijklmnopqrstuvwxyz';
@@ -499,12 +457,50 @@ abstract class Builder
     
     /**
      * 模板字符串替换
-     * @param $string - 原始字符串
+     * @param string $string - 原始字符串
      * @return string - 模板变量替换之后的字符串
      */
-    protected function tplReplaceString(string $string) {
+    protected function tplReplaceString(string $string): string {
         $tplReplaceString = array_merge(get_sub_value('tpl_replace_string', $this->viewConfig, []), (array)Config::get('template.tpl_replace_string'));
         $string = str_replace(array_keys($tplReplaceString), array_values($tplReplaceString), $string);
         return $string;
+    }
+    
+    /**
+     * 获取模板完整路径
+     * @param $template - 模板名
+     * @return string - 完整路径
+     */
+    protected function getTemplateFilePath(string $template): string {
+        $path = $this->rootPath . $this->template . DIRECTORY_SEPARATOR;
+        if (!is_dir($path)) {
+            $path = $this->rootPath . 'default' . DIRECTORY_SEPARATOR;
+        }
+        if (!is_dir($path)) {
+            $path = realpath(__DIR__ . '/../../template/default') . DIRECTORY_SEPARATOR;
+        }
+        if (!empty($this->type)) {
+            $path .= $this->type . DIRECTORY_SEPARATOR;
+        }
+        $path .= $template . '.' . $this->viewConfig['view_suffix'];
+        return $path;
+    }
+    
+    /**
+     * 初始化模板引擎
+     * @return void
+     */
+    protected function viewInit(): void {
+        $this->viewConfig = $this->getViewConfig('template');
+        // 模板引擎普通标签开始标记
+        $this->viewConfig['tpl_begin'] = '{{';
+        // 模板引擎普通标签结束标记
+        $this->viewConfig['tpl_end'] = '}}';
+        // 标签库标签开始标记
+        $this->viewConfig['taglib_begin'] = '{{';
+        // 标签库标签结束标记
+        $this->viewConfig['taglib_end'] = '}}';
+        $this->view = new View();
+        $this->view->init($this->viewConfig);
     }
 }
