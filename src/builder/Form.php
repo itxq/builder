@@ -1,7 +1,7 @@
 <?php
 /**
  *  ==================================================================
- *        文 件 名: FormBuilder.php
+ *        文 件 名: Form.php
  *        概    要: 表单构建器
  *        作    者: IT小强
  *        创建时间: 2018/11/13 12:50
@@ -13,15 +13,16 @@
 namespace itxq\builder;
 
 use itxq\tools\FormSubmit;
+use itxq\tools\Tools;
 use think\Exception;
 use think\facade\Request;
 
 /**
  * 表单构建器
- * Class FormBuilder
+ * Class Form
  * @package itxq\builder
  */
-class FormBuilder extends Builder
+class Form extends Builder
 {
     const id = 'id';
     const value = 'value';
@@ -56,10 +57,21 @@ class FormBuilder extends Builder
     const form_json = 'json';
     const form_text_area = 'text_area';
     const form_text_areas = 'text_areas';
+    
     /**
-     * @var string - 多项表单数据
+     * @var string - 表头
      */
-    protected $itemsHtml = '';
+    protected $startHtml = '';
+    
+    /**
+     * @var string - 表尾
+     */
+    protected $endHtml = '';
+    
+    /**
+     * @var array - 多项表单数据
+     */
+    protected $itemsHtml = [];
     
     /**
      * 表单默认数据
@@ -85,7 +97,7 @@ class FormBuilder extends Builder
     protected $footerBtn = '';
     
     /**
-     * FormBuilder 构造函数.
+     * Form 构造函数.
      * @param array $config - 配置信息
      * [
      *
@@ -118,9 +130,9 @@ class FormBuilder extends Builder
      * @param string $formID - 表单ID
      * @param string $class - css类
      * @throws Exception
-     * @return FormBuilder
+     * @return Form
      */
-    public function start(string $url, string $formID = 'validate-form', string $class = 'form-horizontal') {
+    public function start(string $url = '', string $formID = 'validate-form', string $class = 'form-horizontal') {
         $this->formConfig['form_id'] = $formID;
         $this->formConfig['method'] = 'post';
         $assign = [
@@ -131,25 +143,89 @@ class FormBuilder extends Builder
         ];
         $this->assign($assign);
         $this->curHtml = $this->fetch('start');
-        $this->html = $this->curHtml;
+        $this->startHtml = $this->html = $this->curHtml;
         return $this;
     }
     
     /**
      * 创建表单结尾
-     * @param string $redirectUrl -提交成功后的跳转地址（为空不跳转）
+     * @param string $redirectUrl - 提交成功后的跳转地址（为空不跳转）
+     * @param string $submitBtn - 提交表单按钮（为空不添加）
+     * @param string $resetBtn - 重置表单按钮（为空不添加）
+     * @return $this
      * @throws Exception
-     * @return FormBuilder
      */
-    public function end(string $redirectUrl = '') {
+    public function end(string $redirectUrl = '', string $submitBtn = '提交表单', string $resetBtn = '重置表单') {
+        if (!empty($resetBtn)) {
+            $this->addResetBtn($resetBtn);
+            $this->endHtml .= $this->curHtml;
+        }
+        if (!empty($submitBtn)) {
+            $this->addSubmitBtn($submitBtn);
+            $this->endHtml .= $this->curHtml;
+        }
         // 表单结尾（添加提交/重置按钮等）
-        $html = htmlspecialchars_decode($this->fetch('end'));
-        $this->curHtml = $html;
-        $this->html .= $html;
+        $this->curHtml = htmlspecialchars_decode($this->fetch('end'));
+        $this->html .= $this->curHtml;
+        $this->endHtml .= $this->curHtml;
         $this->addBootstrapValidator($redirectUrl);
         if (Request::isPost()) {
             FormSubmit::submit($this);
             exit();
+        }
+        return $this;
+    }
+    
+    /**
+     * 返回构建好的HTML代码
+     * @param bool $isGroup - 是否按分组返回，当添加多个分组时使用
+     * @return array|string
+     */
+    public function returnForm(bool $isGroup = false) {
+        if (!$isGroup) {
+            return $this->returnHtml();
+        }
+        return [
+            'start' => $this->startHtml,
+            'items' => $this->itemsHtml,
+            'end'   => $this->endHtml,
+        ];
+    }
+    
+    /**
+     * 添加多项表单
+     * @param array $list - 表单数据
+     * @param string $title - 分组名称（添加多分组时需填写）
+     * @return Form
+     */
+    public function addItems(array $list, string $title = '') {
+        $html = '';
+        foreach ($list as $k => $v) {
+            
+            $type = get_sub_value('type', $v, '');
+            if (empty($type)) {
+                continue;
+            }
+            $action = 'add' . Tools::underlineToHump($type, true);
+            
+            if (method_exists($this, $action)) {
+                $this->$action($v);
+                $html .= $this->curHtml;
+                continue;
+            }
+            $events = builder_event_trigger('builder_form_add', [$v, $this], false);
+            foreach ($events as $event) {
+                if (!empty($event)) {
+                    $this->curHtml = $event;
+                    $html .= $event;
+                    break;
+                }
+            }
+        }
+        if (!empty($title)) {
+            $this->itemsHtml[$title] = $html;
+        } else {
+            $this->itemsHtml[] = $html;
         }
         return $this;
     }
@@ -160,7 +236,7 @@ class FormBuilder extends Builder
      * @param string $title - 标题
      * @param array $config - 更多配置
      * @throws Exception
-     * @return FormBuilder
+     * @return Form
      */
     public function addText($name, string $title = '', array $config = []) {
         $config = $this->iniFormItemConfig($name, $title, $config);
@@ -175,7 +251,7 @@ class FormBuilder extends Builder
     /**
      * 添加HR分割线
      * @param string|array $name - 表单元素name属性名
-     * @return FormBuilder
+     * @return Form
      */
     public function addHr($name = '') {
         $this->curHtml = '<hr style="height: 0;width: 100%;margin: 0;padding: 0;color: transparent;border: 0;">';
@@ -188,7 +264,7 @@ class FormBuilder extends Builder
      * @param string|array $name - 令牌名称
      * @param mixed $tokenType - 令牌生成方法
      * @param array $config - 更多配置
-     * @return FormBuilder
+     * @return Form
      */
     public function addToken($name = '__token__', $tokenType = 'md5', array $config = []) {
         $config = $this->iniFormItemConfig($name, $tokenType, $config);
@@ -203,7 +279,7 @@ class FormBuilder extends Builder
      * @param string $title - 标题
      * @param array $config - 更多配置
      * @throws Exception
-     * @return FormBuilder
+     * @return Form
      */
     public function addIco($name, string $title = '', array $config = []) {
         $config = $this->iniFormItemConfig($name, $title, $config);
@@ -240,7 +316,7 @@ class FormBuilder extends Builder
      * @param string $title - 标题
      * @param array $config - 更多配置
      * @throws Exception
-     * @return FormBuilder
+     * @return Form
      */
     public function addFile($name, string $title = '', array $config = []) {
         $this->autoloadAssets('file', 'all');
@@ -261,7 +337,7 @@ class FormBuilder extends Builder
      * @param string $title - 标题
      * @param array $config - 更多配置
      * @throws Exception
-     * @return FormBuilder
+     * @return Form
      */
     public function addHidden($name, string $title = '', array $config = []) {
         $config = $this->iniFormItemConfig($name, $title, $config);
@@ -279,7 +355,7 @@ class FormBuilder extends Builder
      * @param string $title - 标题
      * @param array $config - 更多配置
      * @throws Exception
-     * @return FormBuilder
+     * @return Form
      */
     public function addPassword($name, string $title = '', array $config = []) {
         $config = $this->iniFormItemConfig($name, $title, $config);
@@ -297,7 +373,7 @@ class FormBuilder extends Builder
      * @param string $title - 标题
      * @param array $config - 更多配置
      * @throws Exception
-     * @return FormBuilder
+     * @return Form
      */
     public function addDateRange($name, string $title = '', array $config = []) {
         $config = $this->iniFormItemConfig($name, $title, $config);
@@ -318,7 +394,7 @@ class FormBuilder extends Builder
      * @param string|array $name - 表单元素name属性名
      * @param string $title - 标题
      * @param array $config - 更多配置
-     * @return FormBuilder
+     * @return Form
      * @throws Exception
      */
     public function addJson($name, string $title = '', array $config = []) {
@@ -339,7 +415,7 @@ class FormBuilder extends Builder
      * @param string $title - 标题
      * @param array $config - 更多配置
      * @throws Exception
-     * @return FormBuilder
+     * @return Form
      */
     public function addTags($name, string $title = '', array $config = []) {
         $this->autoloadAssets('tags', 'all');
@@ -358,7 +434,7 @@ class FormBuilder extends Builder
      * @param string $title - 标题
      * @param array $config - 更多配置
      * @throws Exception
-     * @return FormBuilder
+     * @return Form
      */
     public function addColor($name, string $title = '', array $config = []) {
         $this->autoloadAssets('color', 'all');
@@ -379,7 +455,7 @@ class FormBuilder extends Builder
      * @param string $title - 标题
      * @param array $config - 更多配置
      * @throws Exception
-     * @return FormBuilder
+     * @return Form
      */
     public function addTexts($name, string $title = '', array $config = []) {
         $this->autoloadAssets('sortable', 'all');
@@ -398,11 +474,11 @@ class FormBuilder extends Builder
      * @param string $title - 标题
      * @param array $config - 更多配置
      * @throws Exception
-     * @return FormBuilder
+     * @return Form
      */
     public function addTextArea($name, string $title = '', array $config = []) {
         $config = $this->iniFormItemConfig($name, $title, $config);
-        $config[self::value] = $this->getFormData($name, $config[self::value]);
+        $config[self::value] = $this->getFormData($config[self::name], $config[self::value]);
         $config[self::type] = self::form_text_area;
         $config['rows'] = get_sub_value('rows', $config, 4);
         $this->assign($config);
@@ -417,7 +493,7 @@ class FormBuilder extends Builder
      * @param string $title - 标题
      * @param array $config - 更多配置
      * @throws Exception
-     * @return FormBuilder
+     * @return Form
      */
     public function addTextAreas($name, string $title = '', array $config = []) {
         $this->autoloadAssets('sortable', 'all');
@@ -437,7 +513,7 @@ class FormBuilder extends Builder
      * @param string $title - 标题
      * @param array $config - 更多配置
      * @throws Exception
-     * @return FormBuilder
+     * @return Form
      */
     public function addRadio($name, string $title = '', array $config = []) {
         $config = $this->iniFormItemConfig($name, $title, $config);
@@ -461,7 +537,7 @@ class FormBuilder extends Builder
      * @param string $title - 标题
      * @param array $config - 更多配置
      * @throws Exception
-     * @return FormBuilder
+     * @return Form
      */
     public function addCheckbox($name, string $title = '', array $config = []) {
         $config = $this->iniFormItemConfig($name, $title, $config);
@@ -480,7 +556,7 @@ class FormBuilder extends Builder
      * @param string $title - 标题
      * @param array $config - 更多配置
      * @throws Exception
-     * @return FormBuilder
+     * @return Form
      */
     public function addSelect($name, string $title = '', array $config = []) {
         $this->autoloadAssets('select', 'all');
@@ -504,7 +580,7 @@ class FormBuilder extends Builder
      * @param string $title - 标题
      * @param array $config - 更多配置
      * @throws Exception
-     * @return FormBuilder
+     * @return Form
      */
     public function addSwitch($name, string $title = '', array $config = []) {
         $this->autoloadAssets('switch', 'all');
@@ -529,7 +605,7 @@ class FormBuilder extends Builder
      * @param string $title - 标题
      * @param array $config - 更多配置
      * @throws Exception
-     * @return FormBuilder
+     * @return Form
      */
     public function addMap($name, string $title = '', array $config = []) {
         $this->autoloadAssets('map', 'all');
@@ -546,15 +622,14 @@ class FormBuilder extends Builder
     /**
      * 添加 表单提交按钮
      * @param string $btnTitle - 按钮标题
-     * @param string $btnType - 按钮类型(submit/button)
      * @throws Exception
-     * @return FormBuilder
+     * @return Form
      */
-    public function addSubmitBtn(string $btnTitle = '提交表单', string $btnType = 'submit') {
-        $id = $this->createId($btnType, $this->formConfig['form_id']);
+    public function addSubmitBtn(string $btnTitle = '提交表单') {
+        $id = $this->createId('submit', $this->formConfig['form_id']);
         $assign = [
             'btn_title' => $btnTitle,
-            'btn_type'  => $btnType,
+            'btn_type'  => 'submit',
             'id'        => $id
         ];
         $this->assign($assign);
@@ -569,7 +644,7 @@ class FormBuilder extends Builder
      * 添加 表单重置按钮
      * @param string $btnTitle
      * @throws Exception
-     * @return FormBuilder
+     * @return Form
      */
     public function addResetBtn(string $btnTitle = '重置表单') {
         $id = $this->createId('reset', $this->formConfig['form_id']);
@@ -645,7 +720,7 @@ class FormBuilder extends Builder
      * 添加字段验证
      * @param string $name -表达name
      * @param array $config - 验证
-     * @return FormBuilder
+     * @return Form
      */
     public function addValidate(string $name, array $config) {
         if (!isset($this->validateConfig[$name]['validators'])) {
