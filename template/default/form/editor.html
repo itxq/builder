@@ -1,0 +1,23 @@
+<textarea id="{{$id}}" name="{{$name}}" placeholder="{{$placeholder}}" style="display: none;"
+          {{$disabled ? 'disabled="disabled"':''}} {{$readonly ? 'readonly="readonly"':''}}></textarea>
+<script id="{{$id}}_js_con" type="text/plain">{{$value}}</script>
+{{:builder_event_listen($js_hook, function () use($id,$api_url,$upload_url,$value) {
+return <<<EXO
+<script type="text/javascript">
+    (function ($) {
+        var ck_finder_url = '{$upload_url}';
+        var ck_finder_api_title = '来自编辑器 CKEditor';
+        var ck_finder_api_skin = 'neko';
+        var ck_finder_api_swatch = 'b';
+        var ck_finder_api_url = '$api_url';
+        var conId = '#{$id}_js_con';
+        var ckID = '$id';
+        $(document).ready(function () {
+            CKEDITOR.replace(ckID, {
+                filebrowserBrowseUrl: ck_finder_url + '?ck_finder_api_title=' + ck_finder_api_title + '&ck_finder_api_skin=' + ck_finder_api_skin + '&ck_finder_api_swatch=' + ck_finder_api_swatch + '&ck_finder_api_url=' + ck_finder_api_url,
+            }).setData($(conId).html());
+        });
+    }(window.jQuery));
+</script>
+EXO;
+})}}

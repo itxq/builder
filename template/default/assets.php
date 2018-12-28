@@ -29,8 +29,8 @@ return [
     ],
     /* ------------------------------- 拖动排序 ---------------------------------------------------------- */
     'sortable.js'         => [
-        '/assets/Sortable-1.8.0-rc1/Sortable.min.js',
-        '/assets/Sortable-1.8.0-rc1/script.min.js',
+        '/assets/sortable-1.8.0-rc1/sortable.min.js',
+        '/assets/sortable-1.8.0-rc1/script.min.js',
     ],
     /* ------------------------------- select --------------------------------------------------- */
     'select.js'           => [
@@ -82,5 +82,9 @@ return [
     'map.js'              => [
         'https://map.qq.com/api/js?v=2.exp&key=__MAP_KEY__&libraries=place',
         '/assets/qq-map-2.0/qq-map.min.js',
+    ],
+    /* ------------------------------------ 富文本编辑器 ------------------------------------------------- */
+    'editor.js'           => [
+        '/assets/ckeditor-4.11.1/ckeditor.js'
     ],
 ];

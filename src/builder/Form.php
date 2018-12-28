@@ -57,6 +57,32 @@ class Form extends Builder
     const form_json = 'json';
     const form_text_area = 'text_area';
     const form_text_areas = 'text_areas';
+    const form_editor = 'editor';
+    
+    /**
+     * @var array - 表单类型
+     */
+    public static $formType = [
+        self::form_text       => '单行文本框',
+        self::form_texts      => '单行文本框列表',
+        self::form_text_area  => '多行文本域',
+        self::form_text_areas => '多行文本域列表',
+        self::form_json       => 'json键值对',
+        self::form_hidden     => '隐藏域',
+        self::form_password   => '密码框',
+        self::form_map        => '坐标选点器',
+        self::form_file       => '单文件上传',
+        self::form_color      => '颜色选择器',
+        self::form_ico        => '图标选择器',
+        self::form_date_range => '时间范围选择',
+        self::form_checkbox   => '多选框',
+        self::form_radio      => '单选框',
+        self::form_select     => '下拉列表',
+        self::form_tags       => '标签输入框',
+        self::form_hr         => '换行分割线',
+        self::form_switch     => '开关按钮',
+        self::form_editor     => '富文本编辑器',
+    ];
     
     /**
      * @var string - 表头
@@ -398,6 +424,7 @@ class Form extends Builder
      * @throws Exception
      */
     public function addJson($name, string $title = '', array $config = []) {
+        $this->autoloadAssets('sortable', 'all');
         $config = $this->iniFormItemConfig($name, $title, $config);
         $config[self::value] = $this->unSerialize($this->getFormData($config[self::name], $config[self::value]), false);
         $config[self::type] = self::form_json;
@@ -616,6 +643,90 @@ class Form extends Builder
         $config['address'] = get_sub_value('address', $value, '');
         $content = $this->fetch('map');
         $this->curHtml = $this->addItem($content, $config);
+        return $this;
+    }
+    
+    /**
+     * 添加富文本编辑器
+     * @param string|array $name - 表单元素name属性名
+     * @param string $title - 标题
+     * @param array $config - 更多配置
+     * @throws Exception
+     * @return Form
+     */
+    public function addEditor($name, string $title = '', array $config = []) {
+        $this->autoloadAssets('editor', 'all');
+        $config = $this->iniFormItemConfig($name, $title, $config);
+        $config[self::value] = $this->tplReplaceString($this->getFormData($config[self::name], ''));
+        $config['api_url'] = get_sub_value('api_url', $config, '');
+        $config['upload_url'] = get_sub_value('upload_url', $config, '');
+        $this->assign($config);
+        $content = htmlspecialchars_decode($this->fetch('editor'));
+        $this->curHtml = $this->addItem($content, $config);
+        return $this;
+    }
+    
+    /**
+     * 添加显示隐藏
+     * @param string $name - 父级下拉列表name
+     * @param string $subName - 子代父级下拉列表name
+     * @param array $config - 更多配置
+     * [
+     *      // 显示时的值，多个值以英文逗号分割
+     *      'value' => '1,3'
+     * ]
+     * @return Form
+     */
+    public function addToggle($name, $subName = '', $config = []) {
+        $config = $this->iniFormItemConfig($name, $subName, $config);
+        $name = $config[self::name];
+        $value = $config[self::value];
+        $subName = $config[self::title];
+        $js = <<<EXO
+ <script type="text/javascript">
+    $(document).ready(function () {
+         var _name = $('[name="{$name}"]');
+         var _this_val = _name.val();
+          if (_name.is('input')) {
+              _this_val = $('[name="{$name}"]:checked').val();
+          }
+          checkShowOrHide(_this_val, "{$value}".split(","), "{$subName}");
+    });
+    $(document).on("change", '[name="{$name}"]', function () {
+          checkShowOrHide($(this).val(), "{$value}".split(","), "{$subName}");
+    });
+</script>
+EXO;
+        $this->addJs($js);
+        return $this;
+    }
+    
+    /**
+     * 添加下拉联动触发器
+     * @param string $name - 父级下拉列表name
+     * @param string $subName - 子代父级下拉列表name
+     * @param array $config - 更多配置['url'=>'','ready'=>false,'trigger'=>'']
+     * @return Form
+     */
+    public function addTrigger($name, $subName = '', $config = []) {
+        $config = $this->iniFormItemConfig($name, $subName, $config);
+        $name = $config[self::name];
+        $subName = $config[self::title];
+        // ajax 请求地址
+        $url = get_sub_value('url', $config, '');
+        // 触发回调
+        $trigger = get_sub_value('trigger', $config, '');
+        // 是否初始化
+        $ready = $this->getBoolVal(get_sub_value('ready', $config, false)) ? 1 : 0;
+        $formId = $this->formConfig['form_id'];
+        $js = <<<EXO
+<script type="text/javascript">
+    $(document).ready(function() {
+        addTrigger("$name", "$subName", "$url",$ready,"$formId","$trigger");
+    });
+</script>
+EXO;
+        $this->addJs($js);
         return $this;
     }
     
