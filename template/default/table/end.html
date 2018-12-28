@@ -1,0 +1,62 @@
+<script type="text/javascript">
+    (function ($) {
+        var tableId = "#{{$table_id}}";
+        var columnsData = '{{$columns|raw}}';
+        var search = "{{$is_search|default='0'}}" === "1";
+        var pagination = "{{$pagination|default=1}}" === "1";
+        var cardView = "{{$card_view|default=0}}" === "1";
+        var editable = "{{$editable|default=1}}" === "1";
+        $(document).ready(function () {
+            $(tableId).bootstrapTable({
+                striped: true,
+                showExport: true,
+                idTable: "advancedTable",
+                advancedSearch: search,
+                search: search,
+                selectItemName: "{{$select_name|default='son[]'}}",
+                toggle: "table",
+                url: "{{$data_url|raw}}",
+                method: "{{$method|default='post'}}",
+                pagination: pagination,
+                pageSize: "{{$page_size|default='10'}}",
+                pageList: [10, 20, 50, 100, 500, "all"],
+                sidePagination: "{{$side_pagination|default='server'}}",
+                toolbar: "#{{$tool_id}}",
+                showRefresh: true,
+                cardView: cardView,
+                showToggle: true,
+                showColumns: true,
+                exportDataType: "basic",
+                idField: "{{$id_field|default='id'}}",
+                editable: editable,
+                editableUrl: "{{$edit_url|raw}}",
+                editableEmptytext: "未设置",
+                editableUndefinedtext: "-",
+                clickToSelect: true,
+                queryParams: function (params) {
+                    var _searchId = "#{{$search_id}}";
+                    params.search = $(_searchId).serializeJson();
+                    return params;
+                },
+                columns: eval('(' + columnsData + ')')
+            });
+            setDataCardView(tableId);
+        });
+        $(window).resize(function () {
+            setDataCardView(tableId);
+        });
+        
+        function setDataCardView(id) {
+            var options = $(id).bootstrapTable('getOptions');
+            if ($(window).width() < 768) {
+                if (options.cardView === false) {
+                    $(id).bootstrapTable('toggleView');
+                }
+            } else {
+                if (options.cardView === true) {
+                    $(id).bootstrapTable('toggleView');
+                }
+            }
+        }
+    }(window.jQuery));
+</script>
