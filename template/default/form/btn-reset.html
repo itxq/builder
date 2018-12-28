@@ -1,4 +1,4 @@
-<button id="{{$id}}" type="reset" class="btn btn-danger">
+<button id="{{$id}}" type="reset" class="btn btn-warning">
     {{$btn_title|default='重置表单'|raw}}
 </button>
 {{:builder_event_listen($js_hook, function () use($form_id,$id) {
