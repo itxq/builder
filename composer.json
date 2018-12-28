@@ -10,9 +10,11 @@
         }
     ],
     "require"    : {
-        "php"               : ">=7.1.0",
-        "ext-json"          : ">=1.2",
-        "topthink/framework": "v5.2.*-dev"
+        "php"                : ">=7.1.0",
+        "ext-json"           : ">=1.2",
+        "topthink/framework" : "v5.2.*-dev",
+        "composer/installers": "^1.6",
+        "itxq/builder-assets": "dev-master"
     },
     "autoload"   : {
         "psr-4": {
@@ -21,5 +23,10 @@
         "files": [
             "src/helper.php"
         ]
+    },
+    "extra"      : {
+        "installer-paths": {
+            "public/builder-assets": ["itxq/builder-assets"]
+        }
     }
 }
