@@ -1,4 +1,5 @@
 /.idea
+/.user.ini
 /vendor/
 /public/
 /composer.lock
