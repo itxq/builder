@@ -1,3 +1,17 @@
 <input type="hidden" name="{{$name}}" id="hidden_{{$id}}" value="{{$off}}">
-<input placeholder="{{$placeholder}}" type="checkbox" value="{{$on}}" name="{{$name}}" id="{{$id}}" class="bootstrap-switch-item {{$class}}"
+<input placeholder="{{$placeholder}}" type="checkbox" value="{{$on}}" name="{{$name}}" id="{{$id}}" class="{{$class}}"
        {{if $on == $value}}checked="checked"{{/if}} {{$disabled ? 'disabled="disabled"':''}} {{$readonly ? 'readonly="readonly"':''}}>
+{{:builder_event_listen($js_hook, function () use($form_id,$id) {
+return <<<EXO
+<script type='text/javascript'>
+    $(document).ready(function () {
+        $('#$id').bootstrapSwitch({
+            onText: '✔',
+            offText: '✖',
+            onColor: 'success',
+            offColor: 'warning',
+        });
+    });
+</script>
+EXO;
+})}}

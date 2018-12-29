@@ -125,17 +125,17 @@ abstract class Builder
         $this->type = get_sub_value('type', $config, '');
         $this->jsHook = get_sub_value('js_hook', $config, 'hook_js');
         $this->cssHook = get_sub_value('css_hook', $config, 'hook_css');
+        $this->assetsConfig = array_merge($this->getViewConfig('assets'), get_sub_value('assets', $config, []));
+        $this->getAssets();
+        $this->viewInit(get_sub_value('view', $config, []));
+        $assign = ['css_hook' => $this->cssHook, 'js_hook' => $this->jsHook];
+        $this->assign($assign);
         if (get_sub_value('jquery', $config, false)) {
             $this->autoloadAssets('jquery', 'js');
         }
         if (get_sub_value('bootstrap', $config, false)) {
             $this->autoloadAssets('bootstrap', 'all');
         }
-        $this->assetsConfig = array_merge($this->getViewConfig('assets'), get_sub_value('assets', $config, []));
-        $this->getAssets();
-        $this->viewInit(get_sub_value('view', $config, []));
-        $assign = ['css_hook' => $this->cssHook, 'js_hook' => $this->jsHook];
-        $this->assign($assign);
     }
     
     /**

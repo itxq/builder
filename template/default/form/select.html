@@ -1,4 +1,4 @@
-<select class="form-control select-item show-tick {{$class}}"
+<select class="form-control {{$class}}"
         style="display: none"
         data-style="btn-default"
         data-live-search="true"
@@ -28,3 +28,12 @@
     {{/if}}
 {{/foreach}}
 </select>
+{{:builder_event_listen($js_hook, function () use($form_id,$id) {
+return <<<EXO
+<script type='text/javascript'>
+    $(document).ready(function () {
+        $('#$id').selectpicker('render');
+    });
+</script>
+EXO;
+})}}

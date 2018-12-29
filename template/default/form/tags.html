@@ -1,4 +1,16 @@
 <input class="form-control {{$readonly ? '':'bootstrap-tagsinput-role'}}  {{$class}}"
        type="text" id="{{$id}}" name="{{$name}}" value="{{$value}}" placeholder="{{$placeholder}}"
-       {{$disabled ? 'disabled="disabled"':''}} {{$readonly ? 'readonly="readonly"':''}}
->
+       {{$disabled ? 'disabled="disabled"':''}} {{$readonly ? 'readonly="readonly"':''}}>
+{{:builder_event_listen($js_hook, function () use($form_id,$id) {
+return <<<EXO
+<script type='text/javascript'>
+    $(document).ready(function () {
+            $('#$id.bootstrap-tagsinput-role').tagsinput({
+                tagClass: function (item) {
+                    return 'btn btn-info btn-sm';
+                }
+            });
+        });
+</script>
+EXO;
+})}}

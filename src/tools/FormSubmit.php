@@ -18,25 +18,15 @@ use think\Response;
 
 class FormSubmit
 {
-    const TEXT = 'text';
-    const TEXTS = 'texts';
-    const TEXT_AREA = 'text_area';
-    const TEXT_AREAS = 'text_areas';
-    const RADIO = 'radio';
-    const DATE_RANGE = 'date_range';
-    const SELECT = 'select';
-    const CHECKBOX = 'checkbox';
-    const PASSWORD = 'password';
-    const HIDDEN = 'hidden';
-    const JSON = 'json';
-    const COLOR = 'color';
-    const TAGS = 'tags';
-    
+    /**
+     * @param Form $builder
+     * @param string $pk
+     * @param array $allowData
+     */
     public static function submit(Form $builder, string $pk = 'id', array $allowData = []) {
         //var_dump(Request::file('input-gly'));
         $formData = self::getFormData($builder, $pk, $allowData);
         self::success('提交成功', $formData);
-        self::error('提交失败', Request::file('input-gly'));
         exit();
     }
     
@@ -81,18 +71,32 @@ class FormSubmit
      */
     protected static function handleData(Form $builder, string $name, $value, array $type) {
         $type = get_sub_value($name, $type, false);
-        if ($type === self::JSON) {
+        if ($type === $builder::form_json) {
             $value = $builder->unSerialize($value);
         }
         return $value;
     }
     
+    /**
+     * 提交成功返回
+     * @param string $msg - 提示语
+     * @param array $data - 返回数据
+     * @param string $url - 跳转url
+     * @param array $header - 指定额外的header
+     */
     protected static function success($msg = '', $data = [], string $url = '', array $header = []) {
         $info = ['code' => 1, 'msg' => $msg, 'data' => $data, 'url' => $url];
         Response::create($info, 'json', 200)->header($header)->send();
         exit();
     }
     
+    /**
+     * 失败返回
+     * @param string $msg - 提示语
+     * @param array $data - 返回数据
+     * @param string $url - 跳转url
+     * @param array $header - 指定额外的header
+     */
     protected static function error($msg = '', $data = [], string $url = '', array $header = []) {
         $info = ['code' => 0, 'msg' => $msg, 'data' => $data, 'url' => $url];
         Response::create($info, 'json', 200)->header($header)->send();
