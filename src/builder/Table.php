@@ -57,20 +57,8 @@ class Table extends Builder
     protected $columns = [];
     
     /**
-     * TableBuilder 构造函数.
+     * Table 构造函数.
      * @param array $config - 配置信息
-     * [
-     *
-     *  // 通用
-     *  'js_hook'  =>  'admin_js', // js挂载点名称
-     *  'css_hook'  =>  'admin_css', // css挂载点名称
-     *
-     *  // 表单
-     *  'data'  =>  [], // 表单默认数据
-     *  'width'  =>  2, // 表单label宽度
-     *  'template'  =>  'default', // 使用模板名
-     *  'template'  =>  'default', // 使用模板名
-     * ]
      */
     public function __construct(array $config = []) {
         $config['type'] = 'table';

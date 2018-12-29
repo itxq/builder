@@ -56,6 +56,12 @@ abstract class Builder
     protected $viewConfig = [];
     
     /**
+     * 静态资源路径相关配置
+     * @var array
+     */
+    protected $assetsConfig = [];
+    
+    /**
      * 根目录
      * @var string
      */
@@ -100,16 +106,16 @@ abstract class Builder
      * Builder 构造函数.
      * @param array $config - 配置信息
      * [
-     *
      *  // 通用
-     *  'js_hook'  =>  'admin_js', // js挂载点名称
-     *  'css_hook'  =>  'admin_css', // css挂载点名称
-     *  'template_path'  => __DIR__.'/../template/', // 模板路径
+     *  'js_hook'  =>  'hook_js', // js挂载点名称
+     *  'css_hook'  =>  'hook_css', // css挂载点名称
+     *  'assets_path'    => __DIR__ . '/../../assets', // 静态资源路径配置文件
+     *  'template_path'  => __DIR__ . '/../../template', // 模板路径
      *  'template_name'  =>  'default', // 使用模板名
-     *
-     *  // 表单
-     *  'data'  =>  [], // 表单默认数据
-     *  'width'  =>  2, // 表单label宽度
+     *  'view'  =>  [], // 模板视图相关设置
+     *  'assets'  =>  [], // 静态资源路径相关设置
+     *  'jquery'  =>  true, // 是否加载jquery
+     *  'bootstrap'  =>  true, // 是否加载bootstrap
      * ]
      */
     public function __construct(array $config = []) {
@@ -125,28 +131,29 @@ abstract class Builder
         if (get_sub_value('bootstrap', $config, false)) {
             $this->autoloadAssets('bootstrap', 'all');
         }
+        $this->assetsConfig = array_merge($this->getViewConfig('assets'), get_sub_value('assets', $config, []));
         $this->getAssets();
-        $this->viewInit();
+        $this->viewInit(get_sub_value('view', $config, []));
         $assign = ['css_hook' => $this->cssHook, 'js_hook' => $this->jsHook];
         $this->assign($assign);
     }
     
     /**
      * 设置模板名称
-     * @param $template
+     * @param string $template
      * @return $this
      */
-    public function setTemplateName($template) {
+    public function setTemplateName(string $template) {
         $this->template = $template;
         return $this;
     }
     
     /**
      * 添加额外的JS
-     * @param $js - js代码
+     * @param string $js - js代码
      * @return $this | Form | Table | Builder
      */
-    public function addJs($js) {
+    public function addJs(string $js) {
         builder_event_listen($this->jsHook, function () use ($js) {
             return $js;
         });
@@ -155,10 +162,10 @@ abstract class Builder
     
     /**
      * 添加额外的CSS
-     * @param $css - css代码
+     * @param string $css - css代码
      * @return $this | Form | Table | Builder
      */
-    public function addCss($css) {
+    public function addCss(string $css) {
         builder_event_listen($this->cssHook, function () use ($css) {
             return $css;
         });
@@ -171,7 +178,7 @@ abstract class Builder
      * @param string $type - 类型（css/js/all）
      */
     protected function autoloadAssets(string $assetsName, string $type = 'all'): void {
-        $config = $this->getViewConfig('assets');
+        $config = $this->assetsConfig;
         if ($type === 'js') {
             $js = $this->handleAssets($assetsName, $config, 'js');
             builder_event_listen($this->jsHook, function () use ($js) {
@@ -327,6 +334,9 @@ abstract class Builder
         $path = $this->rootPath . $this->template . DIRECTORY_SEPARATOR;
         if (!is_dir($path)) {
             $path = $this->rootPath . 'default' . DIRECTORY_SEPARATOR;
+        }
+        if (!is_dir($path)) {
+            $path = realpath(__DIR__ . '/../../template/default/') . DIRECTORY_SEPARATOR;
         }
         $file = realpath($path . $name . '.php');
         if (!is_file($file)) {
@@ -487,10 +497,11 @@ abstract class Builder
     
     /**
      * 初始化模板引擎
+     * @param array $config
      * @return void
      */
-    protected function viewInit(): void {
-        $this->viewConfig = $this->getViewConfig('template');
+    protected function viewInit($config = []): void {
+        $this->viewConfig = array_merge($this->getViewConfig('template'), $config);
         // 模板引擎普通标签开始标记
         $this->viewConfig['tpl_begin'] = '{{';
         // 模板引擎普通标签结束标记

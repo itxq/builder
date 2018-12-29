@@ -126,24 +126,16 @@ class Form extends Builder
      * Form 构造函数.
      * @param array $config - 配置信息
      * [
-     *
-     *  // 通用
-     *  'js_hook'  =>  'admin_js', // js挂载点名称
-     *  'css_hook'  =>  'admin_css', // css挂载点名称
-     *  'template_path'  => __DIR__.'/../template/', // 模板路径
-     *  'template_name'  =>  'default', // 使用模板名
-     *
      *  // 表单
      *  'data'  =>  [], // 表单默认数据
-     *  'width'  =>  2, // 表单label宽度
+     *  'width'  =>  0, // 表单label宽度
      * ]
-     * @throws Exception
      */
     public function __construct(array $config = []) {
         $config['type'] = 'form';
         parent::__construct($config);
         $this->formData = get_sub_value('data', $config, []);
-        $this->formConfig['width'] = intval(get_sub_value('width', $config, 2));
+        $this->formConfig['width'] = intval(get_sub_value('width', $config, 0));
         if ($this->formConfig['width'] > 12 || $this->formConfig['width'] <= 0) {
             $this->formConfig['width'] = 12;
         }
