@@ -135,7 +135,7 @@ class Form extends Builder
         $config['type'] = 'form';
         parent::__construct($config);
         $this->formData = get_sub_value('data', $config, []);
-        $this->formConfig['width'] = intval(get_sub_value('width', $config, 0));
+        $this->formConfig['width'] = intval(get_sub_value('width', $config, 12));
         if ($this->formConfig['width'] > 12 || $this->formConfig['width'] <= 0) {
             $this->formConfig['width'] = 12;
         }
@@ -143,7 +143,7 @@ class Form extends Builder
     }
     
     /**
-     * 创建表单
+     * 创建表头
      * @param string $url - 表单提交地址
      * @param string $formID - 表单ID
      * @param string $class - css类
@@ -166,7 +166,7 @@ class Form extends Builder
     }
     
     /**
-     * 创建表单结尾
+     * 创建表尾
      * @param string $redirectUrl - 提交成功后的跳转地址（为空不跳转）
      * @param string $submitBtn - 提交表单按钮（为空不添加）
      * @param string $resetBtn - 重置表单按钮（为空不添加）

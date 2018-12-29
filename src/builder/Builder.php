@@ -109,7 +109,7 @@ abstract class Builder
      *  // 通用
      *  'js_hook'  =>  'hook_js', // js挂载点名称
      *  'css_hook'  =>  'hook_css', // css挂载点名称
-     *  'assets_path'    => __DIR__ . '/../../assets', // 静态资源路径配置文件
+     *  'assets_path'    => __DIR__ . '/../../assets', // 静态资源目录
      *  'template_path'  => __DIR__ . '/../../template', // 模板路径
      *  'template_name'  =>  'default', // 使用模板名
      *  'view'  =>  [], // 模板视图相关设置
