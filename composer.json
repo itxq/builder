@@ -26,7 +26,7 @@
     },
     "extra"      : {
         "installer-paths": {
-            "public/builder-assets": ["itxq/builder-assets"]
+            "public/{$name}": ["itxq/builder-assets"]
         }
     }
 }
