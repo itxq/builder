@@ -808,6 +808,7 @@ EXO;
             $config[self::name] = $name;
             $config[self::title] = $title;
         }
+        $config = array_merge($defaultConfig, $config);
         $config[self::id] = $this->createId($config[self::name], $this->formConfig['form_id']);
         $config[self::placeholder] = addslashes(strip_tags($config[self::placeholder]));
         $config[self::disabled] = $this->getBoolVal($config[self::disabled]);
@@ -816,7 +817,7 @@ EXO;
             $this->addValidate($config[self::name], $config[self::validate]);
             unset($config[self::validate]);
         }
-        return array_merge($defaultConfig, $config);
+        return $config;
     }
     
     /**
