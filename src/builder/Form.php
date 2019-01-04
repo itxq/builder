@@ -140,6 +140,7 @@ class Form extends Builder
             $this->formConfig['width'] = 12;
         }
         $this->autoloadAssets('form', 'all');
+        $this->autoloadAssets('builder', 'all');
     }
     
     /**

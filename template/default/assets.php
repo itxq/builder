@@ -16,16 +16,21 @@ return [
     'bootstrap.js'        => [
         '/builder-assets/assets/bootstrap/js/bootstrap.bundle.min.js'
     ],
+    /* ------------------------------- 公共 ---------------------------------------------------------- */
+    'builder.css'         => [
+        '/builder-assets/css/style.min.css',
+    ],
+    'builder.js'          => [
+        '/builder-assets/assets/bootstrap-notify/bootstrap-notify.min.js',
+        '/builder-assets/js/script.min.js',
+    ],
     /* ------------------------------- 表单 ---------------------------------------------------------- */
     'form.css'            => [
         '/builder-assets/assets/bootstrapvalidator/css/bootstrapValidator.min.css',
-        '/builder-assets/css/style.min.css'
     ],
     'form.js'             => [
-        '/builder-assets/assets/bootstrap-notify/bootstrap-notify.min.js',
         '/builder-assets/assets/bootstrapvalidator/js/bootstrapValidator.min.js',
         '/builder-assets/assets/bootstrapvalidator/js/language/zh_CN.js',
-        '/builder-assets/js/script.min.js'
     ],
     /* ------------------------------- 拖动排序 ---------------------------------------------------------- */
     'sortable.js'         => [
@@ -42,11 +47,11 @@ return [
     ],
     /* ------------------------------- 时间、日期范围选择 ------------------------------------------ */
     'daterangepicker.css' => [
-        '/builder-assets/assets/daterangepicker-3.0.3/daterangepicker.css'
+        '/builder-assets/assets/daterangepicker/daterangepicker.css'
     ],
     'daterangepicker.js'  => [
-        '/builder-assets/assets/daterangepicker-3.0.3/moment.min.js',
-        '/builder-assets/assets/daterangepicker-3.0.3/daterangepicker.js',
+        '/builder-assets/assets/daterangepicker/moment.min.js',
+        '/builder-assets/assets/daterangepicker/daterangepicker.js',
     ],
     /* ------------------------------- bootstrap-switch ------------------------------------------ */
     'switch.css'          => [
@@ -82,5 +87,22 @@ return [
     /* ------------------------------------ 富文本编辑器 ------------------------------------------------- */
     'editor.js'           => [
         '/builder-assets/assets/ckeditor/ckeditor.js'
+    ],
+    
+    /* ---------------------------------------------------------------------------------------------------- */
+    'table.js'            => [
+        '/builder-assets/assets/bootstrap-table/bootstrap-table.min.js',
+        //  bootstrap 表格导出
+        // '/builder-assets/assets/bootstrap-export/tableExport.js',
+        '/builder-assets/assets/bootstrap-table/extensions/export/bootstrap-table-export.min.js',
+        //  bootstrap 表格编辑
+        // '/builder-assets/assets/x-editable/bootstrap3-editable/js/bootstrap-editable.min.js',
+        '/builder-assets/assets/bootstrap-table/extensions/editable/bootstrap-table-editable.min.js',
+        // 搜索框
+        '/builder-assets/assets/bootstrap-table/extensions/toolbar/bootstrap-table-toolbar.min.js',
+        '/builder-assets/assets/bootstrap-table/locale/bootstrap-table-zh-CN.min.js',
+    ],
+    'table.css'           => [
+        '/builder-assets/assets/bootstrap-table/bootstrap-table.min.css',
     ],
 ];

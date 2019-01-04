@@ -1,11 +1,11 @@
 <script type="text/javascript">
     (function ($) {
-        var tableId = "#{{$table_id}}";
-        var columnsData = '{{$columns|raw}}';
-        var search = "{{$is_search|default='0'}}" === "1";
-        var pagination = "{{$pagination|default=1}}" === "1";
-        var cardView = "{{$card_view|default=0}}" === "1";
-        var editable = "{{$editable|default=1}}" === "1";
+        let tableId = "#{{$table_id}}";
+        let columnsData = '{{$columns|raw}}';
+        let search = "{{$is_search|default='0'}}" === "1";
+        let pagination = "{{$pagination|default=1}}" === "1";
+        let cardView = "{{$card_view|default=0}}" === "1";
+        let editable = "{{$editable|default=1}}" === "1";
         $(document).ready(function () {
             $(tableId).bootstrapTable({
                 striped: true,
@@ -34,8 +34,8 @@
                 editableUndefinedtext: "-",
                 clickToSelect: true,
                 queryParams: function (params) {
-                    var _searchId = "#{{$search_id}}";
-                    params.search = $(_searchId).serializeJson();
+                    let _searchId = "#{{$search_id}}";
+                  //  params.search = $(_searchId).serializeJson();
                     return params;
                 },
                 columns: eval('(' + columnsData + ')')
@@ -47,7 +47,7 @@
         });
         
         function setDataCardView(id) {
-            var options = $(id).bootstrapTable('getOptions');
+            let options = $(id).bootstrapTable('getOptions');
             if ($(window).width() < 768) {
                 if (options.cardView === false) {
                     $(id).bootstrapTable('toggleView');

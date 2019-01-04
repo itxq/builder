@@ -1,0 +1,106 @@
+<button type="button" class="btn {{$class}}" id="{{$id}}">{{$title|raw}}</button>
+{{:builder_event_listen($js_hook, function () use($id,$url,$success_url,$confirm_title) {
+return <<<EXO
+<script type="text/javascript">
+    (function ($) {
+        $(document).on('click', '#{$id}', function () {
+            doAJaxCheckALL('{$confirm_title}', '当前未选择，请至少选择1项', '{$url}', '{$success_url}', 'true');
+        });
+        
+        /* 用于多选后发起ajax请求 */
+        function doAJaxCheckALL(title, errTitle, url, ajaxCallbackUrl, isTable) {
+            var data = getCheckboxSon("son[]");
+            if (data.length < 1) {
+                alertNotify(errTitle,'danger');
+                return false;
+            }
+            var _trueBtn = '<i class="fa fa-check"></i>&nbsp;确定';
+            var _falseBtn = '<i class="fa fa fa-times"></i>&nbsp;取消';
+            alertConfirm({true_btn:_trueBtn,false_btn:_falseBtn})
+      /*      layer.msg(title, {
+                time: 0,
+                btn: [_trueBtn, _falseBtn],
+                yes: function (index) {
+                    layer.close(index);
+                    doAjax(url, 'POST', data, ajaxCallbackUrl, isTable);
+                }
+            });*/
+        }
+        
+        /* 获取选中的CheckBox并以数组返回 */
+        function getCheckboxSon(name) {
+            var data = [];
+            var childBox = $('input[name="' + name + '"]');
+            childBox.each(function () {
+                if ($(this).is(':checked')) {
+                    data.push($(this).val())
+                }
+            });
+            return data;
+        }
+    
+        /* ajax请求 */
+        function doAjax(ajaxUrl, ajaxType, ajaxData, ajaxCallbackUrl, isTable) {
+            $.ajax({
+                url: ajaxUrl,
+                type: ajaxType,
+                data: {data: ajaxData},
+                dataType: 'json',
+                success: function (re) {
+                    re.code = parseInt(re.code);
+                    if (re.code !== 1) {
+                        alertNotify(re.msg, 'danger');
+                    } else if (re.code === 1 && ajaxCallbackUrl !== 'false') {
+                        alertNotify(re.msg, 'success');
+                        setTimeout(function () {
+                            window.location.href = ajaxCallbackUrl;
+                        }, 2000)
+                    } else if (re.code === 1 && isTable === 'true') {
+                        alertNotify(re.msg, 'success');
+                        $('table').bootstrapTable('refresh');
+                    } else {
+                        alertNotify(re.msg, 'success');
+                    }
+                },
+                error: function (re) {
+                    alertNotify(re.msg, 'danger');
+                    $('.ajax.ajax-action').removeClass('ajax-action');
+                }
+            });
+        }
+    
+        /**
+         * 重写确认框 fun:函数对象 params:参数列表， 可以是数组
+         */
+        function alertConfirm(params) {
+            if ($("#myConfirm").length > 0) {
+                $("#myConfirm").remove();
+            }
+            var trueBtn= params.true_btn?params.true_btn:'确认';
+            var falseBtn= params.false_btn?params.false_btn:'取消';
+            var html = "<div class='modal fade' id='myConfirm' >"
+                + "<div class='modal-backdrop in' style='opacity:0; '></div>"
+                + "<div class='modal-dialog' style='z-index:2901; margin-top:60px; width:400px; '>"
+                + "<div class='modal-content'>"
+                + "<div class='modal-header'  style='font-size:16px; '>"
+                + "<span class='glyphicon glyphicon-envelope'>&nbsp;</span>信息！<button type='button' class='close' data-dismiss='modal'>"
+                + "<span style='font-size:20px;  ' class='glyphicon glyphicon-remove'></span><tton></div>"
+                + "<div class='modal-body text-center' id='myConfirmContent' style='font-size:18px; '>"
+                + "是否确定要删除？"
+                + "</div>"
+                + "<div class='modal-footer' style='border: none;'>"
+                + "<button class='btn btn-info' id='confirmOk'>"+trueBtn+"</button>"
+                + "<button class='btn btn-warning' data-dismiss='modal'>"+falseBtn+"</button>"
+                + "</div>" + "</div></div></div>";
+            $("body").append(html);
+        
+            $("#myConfirm").modal("show");
+        
+            $("#confirmOk").on("click", function() {
+                $("#myConfirm").modal("hide");
+            });
+        }
+    }(window.jQuery));
+</script>
+EXO;
+})}}

@@ -3,5 +3,4 @@
 /vendor/*
 /vendor/
 /public/*
-/public/
 /composer.lock
