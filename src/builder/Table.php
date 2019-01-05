@@ -137,15 +137,43 @@ class Table extends Builder
     }
     
     /**
+     * 获取表格搜索框ID
+     * @return string
+     */
+    public function getSearchId(): string {
+        return $this->searchId;
+    }
+    
+    /**
      * @return string
      * @throws Exception
      */
     public function returnTable(): string {
+        if (!empty($this->searchItem)) {
+            $this->getSearchTool();
+        }
         if (!empty($this->toolBtn)) {
             $this->getTableTool();
         }
         return $this->returnHtml();
     }
+    
+    /**
+     * 添加搜索表单
+     * @param array $formItem - 表单搜索
+     * @return Table
+     * @throws Exception
+     */
+    public function addSearchForm(array $formItem) {
+        $form = new Form(array_merge($this->config, ['width' => 2]));
+        $form = $form->start('', $this->searchId)
+            ->addItems($formItem)
+            ->end('', '<i class="fa fa-search"></i> 搜索', '')
+            ->returnForm(false);
+        $this->searchItem = $form;
+        return $this;
+    }
+    
     /* -------------------------------------------------表格项-------------------------------------------------------- */
     
     /**
@@ -315,5 +343,22 @@ class Table extends Builder
         $this->curHtml = $this->fetch('table-tool');
         $this->html .= $this->curHtml;
         return $this->curHtml;
+    }
+    
+    /**
+     * 获取表格搜索栏
+     * @return string
+     * @throws Exception
+     */
+    protected function getSearchTool(): string {
+        $assign = [
+            'table_id'    => $this->tableId,
+            'search_id'   => $this->searchId,
+            'search_item' => $this->searchItem,
+        ];
+        $this->assign($assign);
+        $html = $this->fetch('search-tool');
+        $this->html = $html . $this->html;
+        return $html;
     }
 }

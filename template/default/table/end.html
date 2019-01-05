@@ -10,6 +10,9 @@
             $(tableId).bootstrapTable({
                 striped: true,
                 showExport: true,
+                exportTypes: ['excel', 'csv', 'json', 'xml', 'txt', 'sql'],
+                /* basic, all, selected */
+                exportDataType: 'selected',
                 idTable: "advancedTable",
                 advancedSearch: search,
                 search: search,
@@ -26,7 +29,6 @@
                 cardView: cardView,
                 showToggle: true,
                 showColumns: true,
-                exportDataType: "basic",
                 idField: "{{$id_field|default='id'}}",
                 editable: editable,
                 editableUrl: "{{$edit_url|raw}}",
@@ -35,7 +37,7 @@
                 clickToSelect: true,
                 queryParams: function (params) {
                     let _searchId = "#{{$search_id}}";
-                  //  params.search = $(_searchId).serializeJson();
+                    params.search = $(_searchId).serialize();
                     return params;
                 },
                 columns: eval('(' + columnsData + ')')

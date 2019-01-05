@@ -21,6 +21,7 @@ return [
         '/builder-assets/css/style.min.css',
     ],
     'builder.js'          => [
+        '/builder-assets/assets/layer/layer.js',
         '/builder-assets/assets/bootstrap-notify/bootstrap-notify.min.js',
         '/builder-assets/js/script.min.js',
     ],
@@ -93,16 +94,20 @@ return [
     'table.js'            => [
         '/builder-assets/assets/bootstrap-table/bootstrap-table.min.js',
         //  bootstrap 表格导出
-        // '/builder-assets/assets/bootstrap-export/tableExport.js',
+        '/builder-assets/assets/table-export/tableExport.min.js',
+        '/builder-assets/assets/table-export/libs/jsPDF/jspdf.min.js',
+        '/builder-assets/assets/table-export/libs/jsPDF-AutoTable/jspdf.plugin.autotable.js',
         '/builder-assets/assets/bootstrap-table/extensions/export/bootstrap-table-export.min.js',
         //  bootstrap 表格编辑
-        // '/builder-assets/assets/x-editable/bootstrap3-editable/js/bootstrap-editable.min.js',
+        
         '/builder-assets/assets/bootstrap-table/extensions/editable/bootstrap-table-editable.min.js',
+        '/builder-assets/assets/bootstrap-editable/js/bootstrap-editable.js',
         // 搜索框
         '/builder-assets/assets/bootstrap-table/extensions/toolbar/bootstrap-table-toolbar.min.js',
         '/builder-assets/assets/bootstrap-table/locale/bootstrap-table-zh-CN.min.js',
     ],
     'table.css'           => [
         '/builder-assets/assets/bootstrap-table/bootstrap-table.min.css',
+        '/builder-assets/assets/bootstrap-editable/css/bootstrap-editable.min.css',
     ],
 ];
