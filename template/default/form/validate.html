@@ -19,9 +19,14 @@
                     }
                 }
                 var form = $(e.target);
+                var formAction = form.attr('action');
                 var formData = form.serialize();
+                if (formAction === '' || formAction === null) {
+                    $(formId).bootstrapValidator('disableSubmitButtons', false);
+                    return false;
+                }
                 $.ajax({
-                    url: form.attr('action'),
+                    url: formAction,
                     type: '{{$method}}',
                     data: formData,
                     dataType: 'json',
