@@ -9,12 +9,12 @@
     </span>
 </div>
 {{:builder_event_listen($js_hook, function () use($id,$format) {
-return <<<EXO
+return <<<HOOK
 <script type="text/javascript">
     $(document).ready(function () {
         var _cpGroupId = '#cpgroup-{$id}';
         $(_cpGroupId).colorpicker({format: '{$format}'});
     });
 </script>
-EXO;
+HOOK;
 })}}

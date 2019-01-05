@@ -1,11 +1,11 @@
 {{$search_item|raw}}
 {{:builder_event_listen($js_hook, function () use($search_id,$table_id) {
-return <<<EXO
+return <<<HOOK
 <script type="text/javascript">
     $(document).on('click', '#$search_id button[type="submit"],#$search_id input[type="submit"]', function () {
         let tableId = '#$table_id';
         $(tableId).bootstrapTable('refresh');
     });
 </script>
-EXO;
+HOOK;
 })}}

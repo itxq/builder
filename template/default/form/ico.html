@@ -50,7 +50,7 @@
     </div>
 </div>
 {{:builder_event_listen($js_hook, function () use($id) {
-return <<<EXO
+return <<<HOOK
 <script type="text/javascript">
     $(document).on('click', '#{$id}modalDialog button.ico-item', function () {
         var ico = $(this).attr('data-ico');
@@ -79,5 +79,5 @@ return <<<EXO
         });
     }
 </script>
-EXO;
+HOOK;
 })}}

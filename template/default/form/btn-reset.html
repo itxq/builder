@@ -2,11 +2,11 @@
     {{$btn_title|default='重置表单'|raw}}
 </button>
 {{:builder_event_listen($js_hook, function () use($form_id,$id) {
-return <<<EXO
+return <<<HOOK
 <script type='text/javascript'>
     $(document).on('click', '#{$id}', function () {
         $('#{$form_id}').bootstrapValidator('resetForm');
     });
 </script>
-EXO;
+HOOK;
 })}}

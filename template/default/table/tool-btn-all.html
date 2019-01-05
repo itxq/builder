@@ -1,10 +1,10 @@
 <button type="button" class="btn {{$class}}" id="{{$id}}">{{$title|raw}}</button>
 {{:builder_event_listen($js_hook, function () use($id,$url,$success_url,$confirm_title,$table_id) {
-return <<<EXO
+return <<<HOOK
 <script type="text/javascript">
     $(document).on('click', '#{$id}', function () {
         doAJaxCheckALL('{$confirm_title}', '当前未选择，请至少选择1项', '{$url}', '{$success_url}', 'true', '{$table_id}');
     });
 </script>
-EXO;
+HOOK;
 })}}

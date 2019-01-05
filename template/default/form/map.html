@@ -14,7 +14,7 @@
 </div>
 <div id="map-container-{{$id}}" style="display: none;"></div>
 {{:builder_event_listen($js_hook, function () use($id) {
-return <<<EXO
+return <<<HOOK
 <script type="text/javascript">
     $(document).ready(function () {
         qqMapInit('map-container-{$id}', 'map-address-{$id}', 'ma-location-{$id}');
@@ -23,5 +23,5 @@ return <<<EXO
         $('#map-container-{$id}').toggle(800);
     });
 </script>
-EXO;
+HOOK;
 })}}

@@ -675,7 +675,7 @@ class Form extends Builder
         $name = $config[self::name];
         $value = $config[self::value];
         $subName = $config[self::title];
-        $js = <<<EXO
+        $js = <<<HOOK
  <script type="text/javascript">
     $(document).ready(function () {
          var _name = $('[name="{$name}"]');
@@ -689,7 +689,7 @@ class Form extends Builder
           checkShowOrHide($(this).val(), "{$value}".split(","), "{$subName}");
     });
 </script>
-EXO;
+HOOK;
         $this->addJs($js);
         return $this;
     }
@@ -712,13 +712,13 @@ EXO;
         // 是否初始化
         $ready = $this->getBoolVal(get_sub_value('ready', $config, false)) ? 1 : 0;
         $formId = $this->formConfig['form_id'];
-        $js = <<<EXO
+        $js = <<<HOOK
 <script type="text/javascript">
     $(document).ready(function() {
         addTrigger("$name", "$subName", "$url",$ready,"$formId","$trigger");
     });
 </script>
-EXO;
+HOOK;
         $this->addJs($js);
         return $this;
     }

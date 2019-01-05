@@ -2,7 +2,7 @@
        type="text" id="{{$id}}" name="{{$name}}" value="{{$value}}" placeholder="{{$placeholder}}"
        {{$disabled ? 'disabled="disabled"':''}} {{$readonly ? 'readonly="readonly"':''}}>
 {{:builder_event_listen($js_hook, function () use($form_id,$id) {
-return <<<EXO
+return <<<HOOK
 <script type='text/javascript'>
     $(document).ready(function () {
             $('#{$id}.bootstrap-tagsinput-role').tagsinput({
@@ -12,5 +12,5 @@ return <<<EXO
             });
         });
 </script>
-EXO;
+HOOK;
 })}}

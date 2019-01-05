@@ -29,11 +29,11 @@
 {{/foreach}}
 </select>
 {{:builder_event_listen($js_hook, function () use($form_id,$id) {
-return <<<EXO
+return <<<HOOK
 <script type='text/javascript'>
     $(document).ready(function () {
         $('#$id').selectpicker('render');
     });
 </script>
-EXO;
+HOOK;
 })}}

@@ -2,7 +2,7 @@
           {{$disabled ? 'disabled="disabled"':''}} {{$readonly ? 'readonly="readonly"':''}}></textarea>
 <script id="{{$id}}_js_con" type="text/plain">{{$value}}</script>
 {{:builder_event_listen($js_hook, function () use($id,$api_url,$upload_url,$value) {
-return <<<EXO
+return <<<HOOK
 <script type="text/javascript">
     (function ($) {
         var ck_finder_url = '{$upload_url}';
@@ -19,5 +19,5 @@ return <<<EXO
         });
     }(window.jQuery));
 </script>
-EXO;
+HOOK;
 })}}
