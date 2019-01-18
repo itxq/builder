@@ -53,7 +53,7 @@ if (!function_exists('builder_event_listen')) {
      * @return void
      */
     function builder_event_listen(string $event, $listener, bool $first = false): void {
-        \think\facade\Event::listen($event, $listener, $first);
+        \think\facade\Hook::add($event, $listener, $first);
     }
 }
 
@@ -66,7 +66,7 @@ if (!function_exists('builder_event_trigger')) {
      * @return mixed
      */
     function builder_event_trigger($event, $params = null, bool $once = false) {
-        $event = \think\facade\Event::trigger($event, $params, $once);
+        $event = \think\facade\Hook::listen($event, $params, $once);
         $html = '';
         if (is_array($event)) {
             foreach ($event as $v) {
