@@ -511,6 +511,6 @@ abstract class Builder
         // 标签库标签结束标记
         $this->viewConfig['taglib_end'] = '}}';
         $this->view = new View();
-        $this->view->init($this->viewConfig);
+        $this->view->config($this->viewConfig);
     }
 }

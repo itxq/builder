@@ -12,7 +12,7 @@
     "require"    : {
         "php"                : ">=7.1.0",
         "ext-json"           : ">=1.2",
-        "topthink/framework" : "v5.2.*-dev",
+        "topthink/think-view": "^1.0",
         "composer/installers": "^1.6",
         "itxq/builder-assets": "dev-master"
     },
