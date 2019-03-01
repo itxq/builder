@@ -118,10 +118,14 @@ abstract class Builder
      *  'bootstrap'  =>  true, // 是否加载bootstrap
      * ]
      */
-    public function __construct(array $config = []) {
+    public function __construct(array $config = [])
+    {
+        $this->config = $config;
         $this->template = get_sub_value('template_name', $config, 'default');
-        $this->rootPath = realpath(get_sub_value('template_path', $config, __DIR__ . '/../../template')) . DIRECTORY_SEPARATOR;
-        $this->assetPath = realpath(get_sub_value('assets_path', $config, __DIR__ . '/../../assets')) . DIRECTORY_SEPARATOR;
+        $this->rootPath = realpath(get_sub_value('template_path', $config,
+                __DIR__ . '/../../template')) . DIRECTORY_SEPARATOR;
+        $this->assetPath = realpath(get_sub_value('assets_path', $config,
+                __DIR__ . '/../../assets')) . DIRECTORY_SEPARATOR;
         $this->type = get_sub_value('type', $config, '');
         $this->jsHook = get_sub_value('js_hook', $config, 'hook_js');
         $this->cssHook = get_sub_value('css_hook', $config, 'hook_css');
@@ -143,7 +147,8 @@ abstract class Builder
      * @param string $template
      * @return $this
      */
-    public function setTemplateName(string $template) {
+    public function setTemplateName(string $template)
+    {
         $this->template = $template;
         return $this;
     }
@@ -153,7 +158,8 @@ abstract class Builder
      * @param string $js - js代码
      * @return $this | Form | Table | Builder
      */
-    public function addJs(string $js) {
+    public function addJs(string $js)
+    {
         builder_event_listen($this->jsHook, function () use ($js) {
             return $js;
         });
@@ -165,7 +171,8 @@ abstract class Builder
      * @param string $css - css代码
      * @return $this | Form | Table | Builder
      */
-    public function addCss(string $css) {
+    public function addCss(string $css)
+    {
         builder_event_listen($this->cssHook, function () use ($css) {
             return $css;
         });
@@ -177,27 +184,30 @@ abstract class Builder
      * @param string $assetsName - 名称
      * @param string $type - 类型（css/js/all）
      */
-    protected function autoloadAssets(string $assetsName, string $type = 'all'): void {
+    protected function autoloadAssets(string $assetsName, string $type = 'all'): void
+    {
         $config = $this->assetsConfig;
         if ($type === 'js') {
             $js = $this->handleAssets($assetsName, $config, 'js');
             builder_event_listen($this->jsHook, function () use ($js) {
                 return $js;
             });
-        } else if ($type === 'css') {
-            $css = $this->handleAssets($assetsName, $config, 'css');
-            builder_event_listen($this->cssHook, function () use ($css) {
-                return $css;
-            });
         } else {
-            $js = $this->handleAssets($assetsName, $config, 'js');
-            builder_event_listen($this->jsHook, function () use ($js) {
-                return $js;
-            });
-            $css = $this->handleAssets($assetsName, $config, 'css');
-            builder_event_listen($this->cssHook, function () use ($css) {
-                return $css;
-            });
+            if ($type === 'css') {
+                $css = $this->handleAssets($assetsName, $config, 'css');
+                builder_event_listen($this->cssHook, function () use ($css) {
+                    return $css;
+                });
+            } else {
+                $js = $this->handleAssets($assetsName, $config, 'js');
+                builder_event_listen($this->jsHook, function () use ($js) {
+                    return $js;
+                });
+                $css = $this->handleAssets($assetsName, $config, 'css');
+                builder_event_listen($this->cssHook, function () use ($css) {
+                    return $css;
+                });
+            }
         }
     }
     
@@ -207,20 +217,27 @@ abstract class Builder
      * @param bool $isJsonType - 是否转换为json键值对的形式
      * @return array
      */
-    public function unSerialize($list, bool $isJsonType = false): array {
+    public function unSerialize($list, bool $isJsonType = false): array
+    {
         // 对普通字符串进行简析
-        if (is_string($list)) {
+        if (is_string($list) || is_numeric($list)) {
             $list = $this->tplReplaceString($list);
             if (empty($list)) {
                 $list = [];
-            } else if (preg_match('/^{{.*?}}$/', $list)) {
-                $list = $this->unSerialize($this->display($list));
-            } else if (preg_match('/^{.*?}$/', $list) || preg_match('/^[.*?]$/', $list)) {
-                $list = json_decode($list, true);
-            } else if (preg_match('/^a:.*?(})$/', $list)) {
-                $list = unserialize($list);
             } else {
-                $list = explode(',', $list);
+                if (preg_match('/^{{.*?}}$/', $list)) {
+                    $list = $this->unSerialize($this->display($list));
+                } else {
+                    if (preg_match('/^{.*?}$/', $list) || preg_match('/^\[.*?\]$/', $list)) {
+                        $list = json_decode($list, true);
+                    } else {
+                        if (preg_match('/^a:.*?(})$/', $list)) {
+                            $list = unserialize($list, null);
+                        } else {
+                            $list = explode(',', $list);
+                        }
+                    }
+                }
             }
         }
         if (!is_array($list) || count($list) < 1) {
@@ -250,7 +267,8 @@ abstract class Builder
      * 返回当前字符串
      * @return string
      */
-    public function getCurHtml(): string {
+    public function getCurHtml(): string
+    {
         return $this->curHtml;
     }
     
@@ -258,7 +276,8 @@ abstract class Builder
      * 返回全部HTML字符串
      * @return string
      */
-    public function returnHtml(): string {
+    public function returnHtml(): string
+    {
         return $this->html;
     }
     
@@ -267,7 +286,8 @@ abstract class Builder
      * @param string|int|bool $val - 原始变量
      * @return bool 布尔值
      */
-    protected function getBoolVal($val): bool {
+    protected function getBoolVal($val): bool
+    {
         if ($val === '1' || $val === true || $val === 1 || $val === 'true') {
             return true;
         } else {
@@ -281,7 +301,8 @@ abstract class Builder
      * @param bool|string $isRound - 是否添加随机数(true添加，为字符串时表示前缀)
      * @return string
      */
-    protected function createId(string $name, $isRound = true): string {
+    protected function createId(string $name, $isRound = true): string
+    {
         $prefix = is_string($isRound) ? $isRound : 'builder_auto_create_';
         $search = ['[', ']'];
         $replace = ['_', '_'];
@@ -294,7 +315,8 @@ abstract class Builder
      * @param $data
      * @return string
      */
-    protected function display(string $data): string {
+    protected function display(string $data): string
+    {
         $data = htmlspecialchars_decode($data);
         $data = $this->view->display($data);
         return $data;
@@ -303,17 +325,17 @@ abstract class Builder
     /**
      * 解析和获取模板内容 用于输出
      * @param  string $template 模板文件名或者内容
-     * @param  array $vars 模板输出变量
      * @return string
      * @throws Exception
      * @throws \Exception
      */
-    protected function fetch(string $template = '', array $vars = []): string {
+    protected function fetch(string $template = ''): string
+    {
         $template = $this->getTemplateFilePath($template);
         if (!is_file($template)) {
             throw new Exception('模板文件{' . $template . '}不存在');
         }
-        return $this->view->fetch($template, $vars, [], false);
+        return $this->view->fetch($template, false);
     }
     
     /**
@@ -321,7 +343,8 @@ abstract class Builder
      * @param  array $vars 要显示的模板变量
      * @return void
      */
-    protected function assign(array $vars): void {
+    protected function assign(array $vars): void
+    {
         $this->view->assign($vars);
     }
     
@@ -330,7 +353,8 @@ abstract class Builder
      * @param string $name - 文件名
      * @return array
      */
-    protected function getViewConfig(string $name = 'template'): array {
+    protected function getViewConfig(string $name = 'template'): array
+    {
         $path = $this->rootPath . $this->template . DIRECTORY_SEPARATOR;
         if (!is_dir($path)) {
             $path = $this->rootPath . 'default' . DIRECTORY_SEPARATOR;
@@ -353,7 +377,8 @@ abstract class Builder
      * @param string $type
      * @return string
      */
-    protected function handleAssets(string $assetsName, array $config, string $type): string {
+    protected function handleAssets(string $assetsName, array $config, string $type): string
+    {
         $assetsHtml = '';
         $defineName = 'AUTOLOAD_ASSETS_' . strtoupper($assetsName) . '_' . strtoupper($type) . '_0';
         if (defined($defineName)) {
@@ -365,9 +390,11 @@ abstract class Builder
             foreach ($assets as $v) {
                 $assetsHtml .= '<script type="text/javascript" src="' . $this->getTrueUrl($v) . '"></script>';
             }
-        } else if ($type === 'css') {
-            foreach ($assets as $v) {
-                $assetsHtml .= '<link rel="stylesheet" type="text/css" href="' . $this->getTrueUrl($v) . '">';
+        } else {
+            if ($type === 'css') {
+                foreach ($assets as $v) {
+                    $assetsHtml .= '<link rel="stylesheet" type="text/css" href="' . $this->getTrueUrl($v) . '">';
+                }
             }
         }
         return $assetsHtml;
@@ -378,22 +405,31 @@ abstract class Builder
      * @param string $url
      * @return string
      */
-    protected function getTrueUrl(string $url): string {
+    protected function getTrueUrl(string $url): string
+    {
         $url = $this->tplReplaceString($url);
         if (empty($url)) {
             $trueUrl = '';
-        } else if (strpos($url, '//') === 0) {
-            $trueUrl = Request::scheme() . ':' . $url;
-        } else if (strpos($url, '/') === 0) {
-            $trueUrl = Request::domain() . $url;
-        } else if (strpos($url, '__builder_assets__/') === 0) {
-            $base = Request::scheme() . '://' . Request::server('HTTP_HOST') . Request::server('PHP_SELF');
-            $trueUrl = $base . '?action=get_assets_common&create_builder_url=' . $url;
-        } else if (strpos($url, 'http://') === 0 || strpos($url, 'https://') === 0) {
-            $trueUrl = $url;
         } else {
-            $base = Request::scheme() . '://' . Request::server('HTTP_HOST') . Request::server('PHP_SELF');
-            $trueUrl = $base . '?action=get_assets&create_builder_url=' . $url;
+            if (strpos($url, '//') === 0) {
+                $trueUrl = Request::scheme() . ':' . $url;
+            } else {
+                if (strpos($url, '/') === 0) {
+                    $trueUrl = Request::domain() . $url;
+                } else {
+                    if (strpos($url, '__builder_assets__/') === 0) {
+                        $base = Request::scheme() . '://' . Request::server('HTTP_HOST') . Request::server('PHP_SELF');
+                        $trueUrl = $base . '?action=get_assets_common&create_builder_url=' . $url;
+                    } else {
+                        if (strpos($url, 'http://') === 0 || strpos($url, 'https://') === 0) {
+                            $trueUrl = $url;
+                        } else {
+                            $base = Request::scheme() . '://' . Request::server('HTTP_HOST') . Request::server('PHP_SELF');
+                            $trueUrl = $base . '?action=get_assets&create_builder_url=' . $url;
+                        }
+                    }
+                }
+            }
         }
         return $trueUrl;
     }
@@ -401,7 +437,8 @@ abstract class Builder
     /**
      * 输出资源文件
      */
-    protected function getAssets() {
+    protected function getAssets()
+    {
         $action = strip_tags(strval(Request::get('action', '')));
         $url = strip_tags(strval(Request::get('create_builder_url', '')));
         $allowAction = ['get_assets', 'get_assets_common'];
@@ -417,16 +454,24 @@ abstract class Builder
         $ext = pathinfo($url, PATHINFO_EXTENSION);
         if ($ext === 'css') {
             $type = 'text/css';
-        } else if ($ext === 'js') {
-            $type = 'text/javascript';
-        } else if ($ext === 'png') {
-            $type = 'image/png';
-        } else if ($ext === 'gif') {
-            $type = 'image/gif';
-        } else if ($ext === 'jpg' || $ext === 'jpeg') {
-            $type = 'image/jpeg';
         } else {
-            $type = 'text/html';
+            if ($ext === 'js') {
+                $type = 'text/javascript';
+            } else {
+                if ($ext === 'png') {
+                    $type = 'image/png';
+                } else {
+                    if ($ext === 'gif') {
+                        $type = 'image/gif';
+                    } else {
+                        if ($ext === 'jpg' || $ext === 'jpeg') {
+                            $type = 'image/jpeg';
+                        } else {
+                            $type = 'text/html';
+                        }
+                    }
+                }
+            }
         }
         header('Content-type:' . $type);
         $path = realpath($path . $url);
@@ -442,7 +487,8 @@ abstract class Builder
      * @param string $type - 指定生成字符串的类型（all-全部，num-纯数字，letter-纯字母）
      * @return string
      */
-    protected function cmRound(int $length = 4, string $type = 'all'): string {
+    protected function cmRound(int $length = 4, string $type = 'all'): string
+    {
         $str = '';
         $strUp = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
         $strLow = 'abcdefghijklmnopqrstuvwxyz';
@@ -458,8 +504,12 @@ abstract class Builder
                 $strPol = $strUp . $number . $strLow;
         }
         $max = strlen($strPol) - 1;
-        for ($i = 0; $i < $length; $i++) {
-            $str .= $strPol[mt_rand(0, $max)];
+        try {
+            for ($i = 0; $i < $length; $i++) {
+                $str .= $strPol[random_int(0, $max)];
+            }
+        } catch (\Exception $exception) {
+        
         }
         return $str;
     }
@@ -469,8 +519,10 @@ abstract class Builder
      * @param string $string - 原始字符串
      * @return string - 模板变量替换之后的字符串
      */
-    protected function tplReplaceString(string $string): string {
-        $tplReplaceString = array_merge(get_sub_value('tpl_replace_string', $this->viewConfig, []), (array)Config::get('template.tpl_replace_string'));
+    protected function tplReplaceString(string $string): string
+    {
+        $tplReplaceString = array_merge(get_sub_value('tpl_replace_string', $this->viewConfig, []),
+            (array)Config::get('template.tpl_replace_string'));
         $string = str_replace(array_keys($tplReplaceString), array_values($tplReplaceString), $string);
         return $string;
     }
@@ -480,7 +532,8 @@ abstract class Builder
      * @param $template - 模板名
      * @return string - 完整路径
      */
-    protected function getTemplateFilePath(string $template): string {
+    protected function getTemplateFilePath(string $template): string
+    {
         $path = $this->rootPath . $this->template . DIRECTORY_SEPARATOR;
         if (!is_dir($path)) {
             $path = $this->rootPath . 'default' . DIRECTORY_SEPARATOR;
@@ -500,7 +553,8 @@ abstract class Builder
      * @param array $config
      * @return void
      */
-    protected function viewInit($config = []): void {
+    protected function viewInit($config = []): void
+    {
         $this->viewConfig = array_merge($this->getViewConfig('template'), $config);
         // 模板引擎普通标签开始标记
         $this->viewConfig['tpl_begin'] = '{{';
@@ -511,6 +565,6 @@ abstract class Builder
         // 标签库标签结束标记
         $this->viewConfig['taglib_end'] = '}}';
         $this->view = new View();
-        $this->view->init($this->viewConfig);
+        $this->view->config($this->viewConfig);
     }
 }
