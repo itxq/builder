@@ -335,7 +335,7 @@ abstract class Builder
         if (!is_file($template)) {
             throw new Exception('模板文件{' . $template . '}不存在');
         }
-        return $this->view->fetch($template, false);
+        return $this->view->fetch($template);
     }
     
     /**
