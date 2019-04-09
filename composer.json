@@ -1,6 +1,6 @@
 {
     "name"       : "itxq/builder",
-    "description": "ThinkPHP5.2专用Html生成器",
+    "description": "ThinkPHP5.1专用Html生成器",
     "type"       : "library",
     "license"    : "Apache-2.0",
     "authors"    : [
@@ -10,9 +10,9 @@
         }
     ],
     "require"    : {
-        "php"                : ">=7.1.0",
-        "ext-json"           : ">=1.2",
-        "topthink/think-view": "^1.0"
+        "php"               : ">=7.1.0",
+        "ext-json"          : ">=1.2",
+        "topthink/framework": "5.1.*"
     },
     "require-dev": {
         "composer/installers": "^1.6"

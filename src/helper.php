@@ -6,13 +6,13 @@
 if (!function_exists('get_think_view')) {
     /**
      * 实例化View
-     * @param  array $config 配置
+     * @param array $config 配置
      * @return \think\View
      */
     function get_think_view($config): \think\View
     {
         $view = new \think\View();
-        $view->config($config);
+        $view->init($config);
         return $view;
     }
 }
@@ -20,12 +20,12 @@ if (!function_exists('get_think_view')) {
 if (!function_exists('builder_event_trigger')) {
     /**
      * 触发事件
-     * @param  string|object $event 事件名称
+     * @param string|object $event 事件名称
      * @return string
      */
     function builder_event_trigger($event): string
     {
-        $event = \think\facade\Event::trigger($event);
+        $event = \think\facade\Hook::listen($event);
         $html = '';
         if (is_array($event)) {
             foreach ($event as $v) {
@@ -41,13 +41,13 @@ if (!function_exists('builder_event_trigger')) {
 if (!function_exists('builder_event_listen')) {
     /**
      * 动态添加行为扩展到某个标签
-     * @param  string $event 事件名称
-     * @param  mixed $listener 监听操作（或者类名）
+     * @param string $event 事件名称
+     * @param mixed $listener 监听操作（或者类名）
      * @return void
      */
     function builder_event_listen(string $event, $listener): void
     {
-        \think\facade\Event::listen($event, $listener);
+        \think\facade\Hook::add($event, $listener, false);
     }
 }
 
