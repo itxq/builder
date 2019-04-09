@@ -21,8 +21,8 @@ return [
         '/builder-assets/css/style.min.css',
     ],
     'builder.js'          => [
-      //  '/builder-assets/assets/layer/layer.js',
-       // '/builder-assets/assets/bootstrap-notify/bootstrap-notify.min.js',
+        '/builder-assets/assets/layer/layer.js',
+        // '/builder-assets/assets/bootstrap-notify/bootstrap-notify.min.js',
         '/builder-assets/js/script.min.js',
     ],
     /* ------------------------------- 表单 ---------------------------------------------------------- */

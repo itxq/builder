@@ -16,7 +16,6 @@ use think\Exception;
 use think\exception\HttpException;
 use think\facade\Config;
 use think\facade\Request;
-use think\View;
 
 /**
  * HTML构建器基类
@@ -122,10 +121,10 @@ abstract class Builder
     {
         $this->config = $config;
         $this->template = get_sub_value('template_name', $config, 'default');
-        $this->rootPath = realpath(get_sub_value('template_path', $config,
-                __DIR__ . '/../../template')) . DIRECTORY_SEPARATOR;
-        $this->assetPath = realpath(get_sub_value('assets_path', $config,
-                __DIR__ . '/../../assets')) . DIRECTORY_SEPARATOR;
+        $defaultRootPath = dirname(__DIR__, 2) . DIRECTORY_SEPARATOR . 'template' . DIRECTORY_SEPARATOR . 'default' . DIRECTORY_SEPARATOR;
+        $this->rootPath = realpath(get_sub_value('template_path', $config, $defaultRootPath)) . DIRECTORY_SEPARATOR;
+        $defaultAssetPath = dirname(__DIR__, 2) . DIRECTORY_SEPARATOR . 'assets' . DIRECTORY_SEPARATOR;
+        $this->assetPath = realpath(get_sub_value('assets_path', $config, $defaultAssetPath)) . DIRECTORY_SEPARATOR;
         $this->type = get_sub_value('type', $config, '');
         $this->jsHook = get_sub_value('js_hook', $config, 'hook_js');
         $this->cssHook = get_sub_value('css_hook', $config, 'hook_css');
@@ -147,7 +146,7 @@ abstract class Builder
      * @param string $template
      * @return $this
      */
-    public function setTemplateName(string $template)
+    public function setTemplateName(string $template): Builder
     {
         $this->template = $template;
         return $this;
@@ -158,7 +157,7 @@ abstract class Builder
      * @param string $js - js代码
      * @return $this | Form | Table | Builder
      */
-    public function addJs(string $js)
+    public function addJs(string $js): Builder
     {
         builder_event_listen($this->jsHook, function () use ($js) {
             return $js;
@@ -171,7 +170,7 @@ abstract class Builder
      * @param string $css - css代码
      * @return $this | Form | Table | Builder
      */
-    public function addCss(string $css)
+    public function addCss(string $css): Builder
     {
         builder_event_listen($this->cssHook, function () use ($css) {
             return $css;
@@ -288,11 +287,7 @@ abstract class Builder
      */
     protected function getBoolVal($val): bool
     {
-        if ($val === '1' || $val === true || $val === 1 || $val === 'true') {
-            return true;
-        } else {
-            return false;
-        }
+        return ($val === '1' || $val === true || $val === 1 || $val === 'true');
     }
     
     /**
@@ -324,7 +319,7 @@ abstract class Builder
     
     /**
      * 解析和获取模板内容 用于输出
-     * @param  string $template 模板文件名或者内容
+     * @param string $template 模板文件名或者内容
      * @return string
      * @throws Exception
      * @throws \Exception
@@ -340,7 +335,7 @@ abstract class Builder
     
     /**
      * 模板变量赋值
-     * @param  array $vars 要显示的模板变量
+     * @param array $vars 要显示的模板变量
      * @return void
      */
     protected function assign(array $vars): void
@@ -360,7 +355,7 @@ abstract class Builder
             $path = $this->rootPath . 'default' . DIRECTORY_SEPARATOR;
         }
         if (!is_dir($path)) {
-            $path = realpath(__DIR__ . '/../../template/default/') . DIRECTORY_SEPARATOR;
+            $path = dirname(__DIR__, 2) . DIRECTORY_SEPARATOR . 'template' . DIRECTORY_SEPARATOR . 'default' . DIRECTORY_SEPARATOR;
         }
         $file = realpath($path . $name . '.php');
         if (!is_file($file)) {
@@ -390,11 +385,9 @@ abstract class Builder
             foreach ($assets as $v) {
                 $assetsHtml .= '<script type="text/javascript" src="' . $this->getTrueUrl($v) . '"></script>';
             }
-        } else {
-            if ($type === 'css') {
-                foreach ($assets as $v) {
-                    $assetsHtml .= '<link rel="stylesheet" type="text/css" href="' . $this->getTrueUrl($v) . '">';
-                }
+        } else if ($type === 'css') {
+            foreach ($assets as $v) {
+                $assetsHtml .= '<link rel="stylesheet" type="text/css" href="' . $this->getTrueUrl($v) . '">';
             }
         }
         return $assetsHtml;
@@ -410,40 +403,34 @@ abstract class Builder
         $url = $this->tplReplaceString($url);
         if (empty($url)) {
             $trueUrl = '';
+        } else if (strpos($url, '//') === 0) {
+            $trueUrl = Request::scheme() . ':' . $url;
+        } else if (strpos($url, '/') === 0) {
+            $trueUrl = Request::domain() . $url;
+        } else if (strpos($url, '__builder_assets__/') === 0) {
+            $base = Request::scheme() . '://' . Request::server('HTTP_HOST') . Request::server('PHP_SELF');
+            $trueUrl = $base . '?action=get_assets_common&create_builder_url=' . $url;
+        } else if (strpos($url, 'http://') === 0 || strpos($url, 'https://') === 0) {
+            $trueUrl = $url;
         } else {
-            if (strpos($url, '//') === 0) {
-                $trueUrl = Request::scheme() . ':' . $url;
-            } else {
-                if (strpos($url, '/') === 0) {
-                    $trueUrl = Request::domain() . $url;
-                } else {
-                    if (strpos($url, '__builder_assets__/') === 0) {
-                        $base = Request::scheme() . '://' . Request::server('HTTP_HOST') . Request::server('PHP_SELF');
-                        $trueUrl = $base . '?action=get_assets_common&create_builder_url=' . $url;
-                    } else {
-                        if (strpos($url, 'http://') === 0 || strpos($url, 'https://') === 0) {
-                            $trueUrl = $url;
-                        } else {
-                            $base = Request::scheme() . '://' . Request::server('HTTP_HOST') . Request::server('PHP_SELF');
-                            $trueUrl = $base . '?action=get_assets&create_builder_url=' . $url;
-                        }
-                    }
-                }
-            }
+            $base = Request::scheme() . '://' . Request::server('HTTP_HOST') . Request::server('PHP_SELF');
+            $trueUrl = $base . '?action=get_assets&create_builder_url=' . $url;
         }
         return $trueUrl;
     }
     
     /**
-     * 输出资源文件
+     * @title 输出资源文件
+     * @author IT小强
+     * @createTime 2019-03-02 11:15:04
      */
-    protected function getAssets()
+    protected function getAssets(): void
     {
-        $action = strip_tags(strval(Request::get('action', '')));
-        $url = strip_tags(strval(Request::get('create_builder_url', '')));
+        $action = (string)Request::get('action', '', 'strip_tags');
+        $url = (string)Request::get('create_builder_url', '', 'strip_tags');
         $allowAction = ['get_assets', 'get_assets_common'];
-        if (empty($action) || empty($url) || !in_array($action, $allowAction)) {
-            return false;
+        if (empty($action) || empty($url) || !in_array($action, $allowAction, true)) {
+            return;
         }
         $url = strtolower($url);
         $path = $this->rootPath;
@@ -454,24 +441,16 @@ abstract class Builder
         $ext = pathinfo($url, PATHINFO_EXTENSION);
         if ($ext === 'css') {
             $type = 'text/css';
+        } else if ($ext === 'js') {
+            $type = 'text/javascript';
+        } else if ($ext === 'png') {
+            $type = 'image/png';
+        } else if ($ext === 'gif') {
+            $type = 'image/gif';
+        } else if ($ext === 'jpg' || $ext === 'jpeg') {
+            $type = 'image/jpeg';
         } else {
-            if ($ext === 'js') {
-                $type = 'text/javascript';
-            } else {
-                if ($ext === 'png') {
-                    $type = 'image/png';
-                } else {
-                    if ($ext === 'gif') {
-                        $type = 'image/gif';
-                    } else {
-                        if ($ext === 'jpg' || $ext === 'jpeg') {
-                            $type = 'image/jpeg';
-                        } else {
-                            $type = 'text/html';
-                        }
-                    }
-                }
-            }
+            $type = 'text/html';
         }
         header('Content-type:' . $type);
         $path = realpath($path . $url);
@@ -509,7 +488,7 @@ abstract class Builder
                 $str .= $strPol[random_int(0, $max)];
             }
         } catch (\Exception $exception) {
-        
+            return $str;
         }
         return $str;
     }
@@ -539,7 +518,7 @@ abstract class Builder
             $path = $this->rootPath . 'default' . DIRECTORY_SEPARATOR;
         }
         if (!is_dir($path)) {
-            $path = realpath(__DIR__ . '/../../template/default') . DIRECTORY_SEPARATOR;
+            $path = dirname(__DIR__, 2) . DIRECTORY_SEPARATOR . 'template' . DIRECTORY_SEPARATOR . 'default' . DIRECTORY_SEPARATOR;
         }
         if (!empty($this->type)) {
             $path .= $this->type . DIRECTORY_SEPARATOR;
@@ -564,7 +543,6 @@ abstract class Builder
         $this->viewConfig['taglib_begin'] = '{{';
         // 标签库标签结束标记
         $this->viewConfig['taglib_end'] = '}}';
-        $this->view = new View();
-        $this->view->config($this->viewConfig);
+        $this->view = get_think_view($this->viewConfig);
     }
 }
