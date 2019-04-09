@@ -12,7 +12,7 @@ if (!function_exists('get_think_view')) {
     function get_think_view($config): \think\View
     {
         $view = new \think\View();
-        $view->init($config);
+        $view->config($config);
         return $view;
     }
 }
@@ -25,7 +25,7 @@ if (!function_exists('builder_event_trigger')) {
      */
     function builder_event_trigger($event): string
     {
-        $event = \think\facade\Hook::listen($event);
+        $event = \think\facade\Event::trigger($event);
         $html = '';
         if (is_array($event)) {
             foreach ($event as $v) {
@@ -47,7 +47,7 @@ if (!function_exists('builder_event_listen')) {
      */
     function builder_event_listen(string $event, $listener): void
     {
-        \think\facade\Hook::add($event, $listener, false);
+        \think\facade\Event::listen($event, $listener);
     }
 }
 
