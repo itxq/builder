@@ -1,10 +1,11 @@
 <div id="tree_{{$id}}"></div>
 <input type="hidden" name="{{$name}}" id="{{$id}}" value="{{$value}}">
-{{:builder_event_listen($js_hook, function () use($form_id,$id) {
+{{:builder_event_listen($js_hook, function () use($form_id,$id,$list,$value) {
 return <<<HOOK
-<script type='text/javascript'>
+<script type="text/javascript">
     $(document).ready(function () {
         let id ="{$id}";
+        let data='{$list}';
         $('#tree_'+id).jstree({
             "plugins": ["checkbox", "types", "themes", "search"],
             "checkbox": {
@@ -22,11 +23,11 @@ return <<<HOOK
                 "multiple": true,
                 "themes": {"stripes": false, "variant": "large", "responsive": false, "ellipsis": true},
                 "check_callback": true,
-                "data": data
+                "data": eval('(' + data + ')')
             }
         }).on('loaded.jstree', function (e, data) {
             let inst = data.instance;
-            let nodeList = "{{$value}}".split(',');
+            let nodeList = "{$value}".split(',');
             $.each(nodeList, function (i, v) {
                 inst.select_node(inst.get_node(v));
             });

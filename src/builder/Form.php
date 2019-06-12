@@ -605,7 +605,7 @@ class Form extends Builder
     public function addSelectTree($name, string $title = '', array $config = []) {
         $this->autoloadAssets('jstree', 'all');
         $config = $this->iniFormItemConfig($name, $title, $config);
-        $config[self::lists] = $this->unSerialize($config[self::lists], false);
+        $config[self::lists] = json_encode($this->unSerialize($config[self::lists], false));
         $config[self::value] = implode(',',$this->unSerialize($this->getFormData($config[self::name], $config[self::value])));
         $config[self::type] = self::form_select;
         $config[self::multiple] = $this->getBoolVal(get_sub_value(self::multiple, $config, false));
