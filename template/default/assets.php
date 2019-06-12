@@ -89,9 +89,15 @@ return [
     'editor.js'           => [
         '/builder-assets/assets/ckeditor/ckeditor.js'
     ],
-    
+    /* ------------------------------------ 树形类插件 ------------------------------------------------- */
+    'jstree.css'          => [
+        '/builder-assets/assets/jstree/themes/default/style.min.css'
+    ],
+    'jstree.js' => [
+        '/builder-assets/assets/jstree/jstree.min.js'
+    ],
     /* ---------------------------------------------------------------------------------------------------- */
-    'table.js'            => [
+    'table.js'  => [
         '/builder-assets/assets/bootstrap-table/bootstrap-table.min.js',
         //  bootstrap 表格导出
         '/builder-assets/assets/table-export/tableExport.min.js',
@@ -99,14 +105,14 @@ return [
         '/builder-assets/assets/table-export/libs/jsPDF-AutoTable/jspdf.plugin.autotable.js',
         '/builder-assets/assets/bootstrap-table/extensions/export/bootstrap-table-export.min.js',
         //  bootstrap 表格编辑
-        
+
         '/builder-assets/assets/bootstrap-table/extensions/editable/bootstrap-table-editable.min.js',
         '/builder-assets/assets/bootstrap-editable/js/bootstrap-editable.js',
         // 搜索框
         '/builder-assets/assets/bootstrap-table/extensions/toolbar/bootstrap-table-toolbar.min.js',
         '/builder-assets/assets/bootstrap-table/locale/bootstrap-table-zh-CN.min.js',
     ],
-    'table.css'           => [
+    'table.css' => [
         '/builder-assets/assets/bootstrap-table/bootstrap-table.min.css',
         '/builder-assets/assets/bootstrap-editable/css/bootstrap-editable.min.css',
     ],

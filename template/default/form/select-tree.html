@@ -1,0 +1,43 @@
+<div id="tree_{{$id}}"></div>
+<input type="hidden" name="{{$name}}" id="{{$id}}" value="{{$value}}">
+{{:builder_event_listen($js_hook, function () use($form_id,$id) {
+return <<<HOOK
+<script type='text/javascript'>
+    $(document).ready(function () {
+        let id ="{$id}";
+        $('#tree_'+id).jstree({
+            "plugins": ["checkbox", "types", "themes", "search"],
+            "checkbox": {
+                "keep_selected_style": false,
+                "tie_selection": true,
+                "whole_node": true,
+                "three_state": true
+            },
+            "types": {
+                "default": {"icon": "fa fa-file icon-state-warning icon-lg"},
+                "folder": {"icon": "fa fa-folder icon-state-warning icon-lg"},
+                "file": {"icon": "fa fa-file icon-state-warning icon-lg"}
+            },
+            "core": {
+                "multiple": true,
+                "themes": {"stripes": false, "variant": "large", "responsive": false, "ellipsis": true},
+                "check_callback": true,
+                "data": data
+            }
+        }).on('loaded.jstree', function (e, data) {
+            let inst = data.instance;
+            let nodeList = "{{$value}}".split(',');
+            $.each(nodeList, function (i, v) {
+                inst.select_node(inst.get_node(v));
+            });
+        }).on("changed.jstree", function (e, data) {
+            let id = "tree_{$id}";
+            let valId = "{$id}";
+            let selectedIds = $('#' + id).jstree(true).get_selected(false);
+            selectedIds = selectedIds.join(',');
+            $('#' + valId).val(selectedIds);
+        });
+    });
+</script>
+HOOK;
+})}}
