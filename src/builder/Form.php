@@ -593,7 +593,28 @@ class Form extends Builder
         $this->curHtml = $this->addItem($content, $config);
         return $this;
     }
-    
+
+    /**
+     * 添加树形下拉选项框
+     * @param string|array $name - 表单元素name属性名
+     * @param string $title - 标题
+     * @param array $config - 更多配置
+     * @throws Exception
+     * @return Form
+     */
+    public function addSelectTree($name, string $title = '', array $config = []) {
+        $this->autoloadAssets('jstree', 'all');
+        $config = $this->iniFormItemConfig($name, $title, $config);
+        $config[self::lists] = $this->unSerialize($config[self::lists], false);
+        $config[self::value] = implode(',',$this->unSerialize($this->getFormData($config[self::name], $config[self::value])));
+        $config[self::type] = self::form_select;
+        $config[self::multiple] = $this->getBoolVal(get_sub_value(self::multiple, $config, false));
+        $this->assign($config);
+        $content = $this->fetch('select-tree');
+        $this->curHtml = $this->addItem($content, $config);
+        return $this;
+    }
+
     /**
      * 添加switch开关
      * @param string|array $name - 表单元素name属性名
